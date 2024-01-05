@@ -10,6 +10,7 @@ packages = [{include = "data_pipeline"}]
 [tool.poetry.dependencies]
 python = "3.10.4"
 pydantic = "^2.5.3"
+pydantic-settings = "^2.1.0"
 
 
 [build-system]
