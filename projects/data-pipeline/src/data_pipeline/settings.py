@@ -5,7 +5,7 @@ class Settings(BaseSettings):
     """Base settings object"""
 
     log_level: str = "INFO"
-    sample_setting: str = ""
+    sample_setting: str = "Nicola Filosi"
 
     class Config:
         """Loads the env vars from a .env file"""
