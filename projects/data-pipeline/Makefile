@@ -1,4 +1,4 @@
 run:
-	poetry run python -m content_pipeline.main
+	poetry run python -m data_pipeline.main
 
 include ../../scripts/component.mk
