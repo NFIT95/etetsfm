@@ -1,5 +1,5 @@
 """Settings for the Data Pipeline application"""
-from pydantic import BaseSettings
+from pydantic-settings import BaseSettings
 
 class Settings(BaseSettings):
     """Base settings object"""
