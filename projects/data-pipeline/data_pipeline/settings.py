@@ -2,6 +2,7 @@
 from pydantic_settings import BaseSettings
 
 
+# pylint: disable=too-few-public-methods
 class Settings(BaseSettings):
     """Base settings object"""
 
