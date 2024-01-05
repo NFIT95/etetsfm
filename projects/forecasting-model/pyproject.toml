@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "forecasting model"
+version = "0.1.0"
+description = "Sales forecasting model"
+authors = ["Nicola Filosi"]
+license = "free"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.10.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
