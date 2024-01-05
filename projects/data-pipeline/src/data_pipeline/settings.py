@@ -10,5 +10,5 @@ class Settings(BaseSettings):
     class Config:
         """Loads the env vars from a .env file"""
 
-        env_file = ".env"
+        env_file = "../.env"
         case_sensitive = False
