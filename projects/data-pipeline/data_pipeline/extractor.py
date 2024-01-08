@@ -74,7 +74,7 @@ class CountriesSchema(BaseModel):
 
 @dataclass
 class Storage:
-    """Data general storage for validated and broken data"""
+    """General data storage for validated and broken JSON lines"""
 
     json_lines: List[dict] = field(default_factory=list)
     json_lines_broken: List[dict] = field(default_factory=list)
@@ -86,10 +86,10 @@ def _remove_final_comma(json_line: dict) -> dict:
     otherwise return the JSON file line as is
 
     Args:
-        json_line (str): input JSON file line with final comma
+        json_line (dict): input JSON file line with final comma
 
     Returns:
-        json_line (str): input JSON file line without final comma
+        json_line (dict): input JSON file line without final comma
     """
     if json_line[-2] == ",":
         json_line = json.loads(json_line[:-2])
@@ -105,10 +105,10 @@ def _remove_undesired_characters_from_schema(json_line: dict) -> dict:
     file line during extraction to allow for Pydantic validation
 
     Args:
-        json_line (str): input JSON file line with blank spaces in any attribute
+        json_line (dict): input JSON file line with blank spaces in any attribute
 
     Returns:
-        renamed_json_line (str): input JSON file line without blank spaces in any attribute
+        renamed_json_line (dict): input JSON file line without blank spaces in any attribute
     """
     undesired_characters = [" ", ".", "(", ")", "$", "%"]
     renamed_json_line = {}
@@ -131,9 +131,10 @@ def _validate_json_line_schema(
     Args:
         json_file_name (str): input JSON file name
         json_line (dict): input JSON file name line
+        storage: dataclass object with lists to store validated and broken data
 
     Returns:
-        BaseModel: input JSON file Pydantic validator
+        BaseModel: input JSON file specific Pydantic validator
     """
     validators = {
         "sales": SalesSchema,
@@ -160,13 +161,12 @@ def extract_data_from_json_file(
     Extract data from a JSON file with one JSON object per line
 
     Args:
-        json_file_path (str): path to an input JSON file with data to be extracted from
         json_file_name (str): input JSON file name
         storage: dataclass object with lists to store validated and broken data
 
     Returns:
-        json_lines = list of input JSON file lines with a validated schema
-        json_lines_broken = list of input JSON file lines without a validated schema
+        json_lines (list[dict]): list of input JSON file lines with a validated schema
+        json_lines_broken (list[dict]): list of input JSON file lines without a validated schema
     """
     storage = Storage()
 
