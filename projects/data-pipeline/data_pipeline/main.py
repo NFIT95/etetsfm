@@ -4,6 +4,7 @@ from data_pipeline import settings
 
 def main():
     """Main entry point"""
+
     print(f"FANTASTIC JOB {settings.sample_setting}")
 
 
