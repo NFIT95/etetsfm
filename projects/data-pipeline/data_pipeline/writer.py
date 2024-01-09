@@ -1,10 +1,17 @@
 """Writer module to write data to physical files"""
 
-import polars as pl
 from datetime import datetime
 
-def write_data_to_parquet_file(flat_structure: pl.DataFrame, folder_name: str, parquet_file_name: str) -> None:
+import polars as pl
+
+
+def write_data_to_file(
+    flat_structure: pl.DataFrame, folder_name: str, file_name: str, file_type: str
+) -> None:
     """PyDocs"""
-    timestamp = datetime.now()
-    output_path = "data" + "/" + folder_name + "/" + str(timestamp) + parquet_file_name + ".parquet"
-    flat_structure.write_parquet(output_path)
+    output_path = f"data/{folder_name}/{str(datetime.now())}_{file_name}.{file_type}"
+    match file_type:
+        case "csv":
+            flat_structure.write_csv(output_path)
+        case "parquet":
+            flat_structure.write_parquet(output_path)
