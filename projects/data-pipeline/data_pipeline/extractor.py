@@ -4,55 +4,55 @@ import json
 from dataclasses import dataclass, field
 from typing import List, Optional
 
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, ValidationError, Field
 
 
 class SalesSchema(BaseModel):
     """Sales JSON file schema"""
 
-    SaleId: int
-    OrderId: int
-    ProductId: int
-    Quantity: int
+    SaleId: int = Field(strict=True)
+    OrderId: int = Field(strict=True)
+    ProductId: int = Field(strict=True)
+    Quantity: int = Field(strict=True)
 
 
 class ProductsSchema(BaseModel):
     """Products JSON file schema"""
 
-    ProductId: int
-    Name: str
-    ManufacturedCountry: str
-    WeightGrams: int
+    ProductId: int = Field(strict=True)
+    Name: str = Field(strict=True)
+    ManufacturedCountry: str = Field(strict=True)
+    WeightGrams: int = Field(strict=True)
 
 
 class OrdersSchema(BaseModel):
     """Orders JSON file schema"""
 
-    OrderId: int
-    CustomerId: int
-    Date: str
+    OrderId: int = Field(strict=True)
+    CustomerId: int = Field(strict=True)
+    Date: str = Field(strict=True)
 
 
 class CustomersSchema(BaseModel):
     """Customers JSON file schema"""
 
-    CustomerId: int
-    Active: bool
-    Name: str
-    Address: str
-    City: str
-    Country: str
-    Email: str
+    CustomerId: int = Field(strict=True)
+    Active: bool = Field(strict=True)
+    Name: str = Field(strict=True)
+    Address: str = Field(strict=True)
+    City: str = Field(strict=True)
+    Country: str = Field(strict=True)
+    Email: str = Field(strict=True)
 
 
 class CountriesSchema(BaseModel):
     """Countries JSON file schema"""
 
-    Country: str
-    Currency: str
-    Name: str
-    Region: str
-    Population: int
+    Country: str = Field(strict=True)
+    Currency: str = Field(strict=True)
+    Name: str = Field(strict=True)
+    Region: str = Field(strict=True)
+    Population: int = Field(strict=True)
     Area__sq__mi__: Optional[float]
     Pop__Density__per_sq__mi__: Optional[float]
     Coastline__coast_per_area_ratio_: Optional[float]
@@ -99,7 +99,7 @@ def _remove_final_comma(json_line: dict) -> dict:
     return json_line
 
 
-def _remove_undesired_characters_from_schema(json_line: dict) -> dict:
+def _remove_undesired_characters_from_schema_attributes(json_line: dict) -> dict:
     """
     Removes undesired characters from schema attributes in an input JSON
     file line during extraction to allow for Pydantic validation
@@ -170,7 +170,10 @@ def extract_data_from_json_file(
     """
     storage = Storage()
 
-    cleaning_functions = [_remove_final_comma, _remove_undesired_characters_from_schema]
+    cleaning_functions = [
+        _remove_final_comma,
+        _remove_undesired_characters_from_schema_attributes,
+    ]
 
     with open(
         "data" + "/" + "raw_data" + "/" + json_file_name + ".json", encoding="utf-8"
