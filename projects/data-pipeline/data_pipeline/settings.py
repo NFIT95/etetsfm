@@ -1,4 +1,4 @@
-"""Settings for the Data Pipeline application"""
+"""Settings for the Data Pipeline application - not yet in use"""
 from pydantic_settings import BaseSettings
 
 
@@ -6,7 +6,6 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     """Base settings object"""
 
-    log_level: str = "INFO"
     sample_setting: str = "Nicola Filosi"
 
     class Config:
