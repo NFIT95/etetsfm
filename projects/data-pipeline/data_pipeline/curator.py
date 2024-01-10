@@ -152,9 +152,8 @@ def materialize_curated_flat_structures(
 
         if not validation_results:
             print(
-                "Validation unsuccessful. Curated data related to "
-                + json_file_name
-                + " does not match expectations. Stopping execution now."
+                f"""Validation unsuccessful. Curated data related to {json_file_name}
+                does not match expectations. Stopping execution now."""
             )
             break
 
