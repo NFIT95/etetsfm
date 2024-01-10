@@ -4,7 +4,7 @@ from datetime import datetime
 
 import pandas as pd
 
-STORAGE_ROOT_FOLDER = "data"
+DATA_ROOT_FOLDER = "data"
 
 
 def write_data_to_file(
@@ -20,7 +20,7 @@ def write_data_to_file(
         file_name (str): name of the file that will be written
         file_type (str): type of file that will be written, either csv or parquet
     """
-    output_path = f"{STORAGE_ROOT_FOLDER}/{folder_name}/{str(datetime.now())}_{file_name}.{file_type}"
+    output_path = f"{DATA_ROOT_FOLDER}/{folder_name}/{str(datetime.now())}_{file_name}.{file_type}"
     match file_type:
         case "csv":
             flat_structure.to_csv(output_path)
