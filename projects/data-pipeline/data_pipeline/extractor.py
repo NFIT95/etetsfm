@@ -1,10 +1,11 @@
 """Extractor module to extract data from raw json files"""
 
 import json
+import re
 from dataclasses import dataclass, field
 from typing import List, Optional
 
-from pydantic import BaseModel, ValidationError, Field
+from pydantic import BaseModel, Field, ValidationError
 
 
 class SalesSchema(BaseModel):
@@ -53,17 +54,17 @@ class CountriesSchema(BaseModel):
     Name: str = Field(strict=True)
     Region: str = Field(strict=True)
     Population: int = Field(strict=True)
-    Area__sq__mi__: Optional[float]
-    Pop__Density__per_sq__mi__: Optional[float]
-    Coastline__coast_per_area_ratio_: Optional[float]
-    Net_migration: Optional[float]
-    Infant_mortality__per_1000_births_: Optional[float]
-    GDP____per_capita_: Optional[float]
-    Literacy____: Optional[float]
-    Phones__per_1000_: Optional[float]
-    Arable____: Optional[float]
-    Crops____: Optional[float]
-    Other____: Optional[float]
+    AreaSqMi: Optional[float]
+    PopDensityPerSqMi: Optional[float]
+    CoastlineCoastPerAreaRatio: Optional[float]
+    NetMigration: Optional[float]
+    InfantMortalityPer1000Births: Optional[float]
+    GDPPerCapita: Optional[float]
+    Literacy: Optional[float]
+    PhonesPer1000: Optional[float]
+    Arable: Optional[float]
+    Crops: Optional[float]
+    Other: Optional[float]
     Climate: Optional[float]
     Birthrate: Optional[float]
     Deathrate: Optional[float]
@@ -99,7 +100,7 @@ def _remove_final_comma(json_line: dict) -> dict:
     return json_line
 
 
-def _remove_undesired_characters_from_schema_attributes(json_line: dict) -> dict:
+def _rename_keys(json_line: dict) -> dict:
     """
     Removes undesired characters from schema attributes in an input JSON
     file line during extraction to allow for Pydantic validation
@@ -116,8 +117,13 @@ def _remove_undesired_characters_from_schema_attributes(json_line: dict) -> dict
     for key, value in json_line.items():
         for character in key:
             if character in undesired_characters:
+                # Replace all undesired characters with _ to allow for regex
                 key = key.replace(character, "_")
-        renamed_json_line[key] = value
+        # Apply CamelCase naming and remove all _
+        new_key = re.sub(
+            r"(?<=_)([^_])", lambda match: match.group(1).upper(), key
+        ).replace("_", "")
+        renamed_json_line[new_key] = value
 
     return renamed_json_line
 
@@ -172,7 +178,7 @@ def extract_data_from_json_file(
 
     cleaning_functions = [
         _remove_final_comma,
-        _remove_undesired_characters_from_schema_attributes,
+        _rename_keys,
     ]
 
     with open(
