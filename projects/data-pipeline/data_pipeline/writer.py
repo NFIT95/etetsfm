@@ -23,6 +23,7 @@ def write_data_to_file(
         folder_name (str): name of the folder where the file will be written
         file_name (str): name of the file that will be written
         file_type (str): type of file that will be written, either csv or parquet
+        write_method (str): method that will be used to write the data to a file
     """
     output_path = f"{DATA_ROOT_FOLDER}/{folder_name}/{str(datetime.now())}_{file_name}.{file_type}"
     return getattr(flat_structure, write_method)(output_path)
