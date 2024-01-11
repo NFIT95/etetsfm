@@ -2,5 +2,5 @@
 __pycache__/
 curated_data/
 data_profiles/
-quarantined_data/
-clean_data
+quarantine_data/
+clean_data/
