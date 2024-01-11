@@ -59,7 +59,6 @@ def extract_json_lines_from_json_file(json_file_name: str) -> list[dict]:
 
     Args:
         json_file_name (str): input JSON file name
-        json_lines_storage: dataclass object with lists to store json lines
 
     Returns:
         extracted_json_lines (list[dict]): list of input JSON file clean lines
