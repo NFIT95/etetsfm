@@ -29,13 +29,13 @@ def check_json_lines(
     Returns a given JSON line schema validator depending on the input JSON file
 
     Args:
+        extracted_json_lines (list[dict]): list of input JSON file lines
         json_file_name (str): input JSON file name
-        json_line (dict): input JSON file name line
-        json_lines_storage: dataclass object with lists to store validated and broken data
+        json_files_validators (dict): pydantic validators for input JSON file lines
 
     Returns:
-        json_lines_storage (list[dict]): either a list of JSON lines with a validated schema
-        or a list of JSON lines with an un-validated JSON schema
+        valid_and_broken_json_lines (dict): dict with json lines that passed validation
+        and json lines that did not, each is a polars Dataframe
     """
     json_lines_storage = JsonLinesStorage()
 
@@ -49,10 +49,12 @@ def check_json_lines(
             print("Incorrect schema in JSON line: ", ValidationError)
             json_lines_storage.broken_json_lines.append(extracted_json_line)
 
-    return {
+    valid_and_broken_json_lines = {
         "valid_json_lines": pl.DataFrame(json_lines_storage.valid_json_lines),
         "broken_json_lines": pl.DataFrame(json_lines_storage.broken_json_lines),
     }
+
+    return valid_and_broken_json_lines
 
 
 def create_gx_filesystem_context() -> gx.DataContext:
@@ -108,6 +110,9 @@ def _create_gx_batch_request(
         datasource (gx): great_expectations datasource
         data_asset_name (str): name of the data asset
         flat_structure (pd.DataFrame): input Pandas dataframe
+
+    Returns:
+        batch_request (gx): great_expectations batch request
     """
     data_asset = datasource.add_dataframe_asset(name=data_asset_name)
     batch_request = data_asset.build_batch_request(dataframe=flat_structure)
@@ -138,14 +143,16 @@ def _create_gx_validator(
 
 def _validate_gx_sales_curated_expectations(
     validator: gx, expectations_storage: SalesExpectationsStorage
-) -> None:
+) -> gx:
     """
-    Creates expectations for sales data against the input
-    validator
+    Creates expectations for sales data against the input validator
 
     Args:
         validator (gx): great_expectations validator
         expectations_storage (SalesExpectationsStorage): expectations storage
+
+    Returns:
+        validator_results (gx): expectations validation results
     """
     expectations_storage = SalesExpectationsStorage()
 
@@ -156,12 +163,14 @@ def _validate_gx_sales_curated_expectations(
     for column in expectations_storage.columns_to_be_unique:
         validator.expect_column_values_to_be_unique(column)
 
-    return validator.validate()["success"]
+    validator_results = validator.validate()["success"]
+
+    return validator_results
 
 
 def _validate_gx_products_curated_expectations(
     validator: gx, expectations_storage: ProductsExpectationsStorage
-) -> None:
+) -> gx:
     """
     Creates expectations for products data against the input
     validator
@@ -169,6 +178,9 @@ def _validate_gx_products_curated_expectations(
     Args:
         validator (gx): great_expectations validator
         expectations_storage (SalesExpectationsStorage): expectations storage
+
+    Returns:
+        validator_results (gx): expectations validation results
     """
     expectations_storage = ProductsExpectationsStorage()
 
@@ -182,12 +194,14 @@ def _validate_gx_products_curated_expectations(
     for column in expectations_storage.columns_with_length_equal_to:
         validator.expect_column_value_lengths_to_equal(column, 2)
 
-    return validator.validate()["success"]
+    validation_results = validator.validate()["success"]
+
+    return validation_results
 
 
 def _validate_gx_orders_curated_expectations(
     validator: gx, expectations_storage: OrdersExpectationsStorage
-) -> None:
+) -> gx:
     """
     Creates expectations for orders data against the input
     validator
@@ -195,6 +209,9 @@ def _validate_gx_orders_curated_expectations(
     Args:
         validator (gx): great_expectations validator
         expectations_storage (SalesExpectationsStorage): expectations storage
+
+    Returns:
+        validator_results (gx): expectations validation results
     """
     expectations_storage = OrdersExpectationsStorage()
 
@@ -205,12 +222,14 @@ def _validate_gx_orders_curated_expectations(
     for column in expectations_storage.columns_to_be_unique:
         validator.expect_column_values_to_be_unique(column)
 
-    return validator.validate()["success"]
+    validator_results = validator.validate()["success"]
+
+    return validator_results
 
 
 def _validate_gx_customers_curated_expectations(
     validator: gx, expectations_storage: CustomersExpectationsStorage
-) -> None:
+) -> gx:
     """
     Creates expectations for customers data against the input
     validator
@@ -218,6 +237,9 @@ def _validate_gx_customers_curated_expectations(
     Args:
         validator (gx): great_expectations validator
         expectations_storage (SalesExpectationsStorage): expectations storage
+
+    Returns:
+        validator_results (gx): expectations validation results
     """
     expectations_storage = CustomersExpectationsStorage()
 
@@ -231,12 +253,14 @@ def _validate_gx_customers_curated_expectations(
     for column in expectations_storage.columns_with_length_equal_to:
         validator.expect_column_value_lengths_to_equal(column, 2)
 
-    return validator.validate()["success"]
+    validator_results = validator.validate()["success"]
+
+    return validator_results
 
 
 def _validate_gx_countries_curated_expectations(
     validator: gx, expectations_storage: CountriesExpectationsStorage
-) -> None:
+) -> gx:
     """
     Creates expectations for countries data against the input
     validator
@@ -244,6 +268,9 @@ def _validate_gx_countries_curated_expectations(
     Args:
         validator (gx): great_expectations validator
         expectations_storage (SalesExpectationsStorage): expectations storage
+
+    Returns:
+        validator_results (gx): expectations validation results
     """
     expectations_storage = CountriesExpectationsStorage()
 
@@ -260,7 +287,9 @@ def _validate_gx_countries_curated_expectations(
     ):
         validator.expect_column_value_lengths_to_equal(column, length)
 
-    return validator.validate()["success"]
+    validator_results = validator.validate()["success"]
+
+    return validator_results
 
 
 def validate_curated_flat_structure(
@@ -269,7 +298,7 @@ def validate_curated_flat_structure(
     json_file_name: str,
     expectation_suite_name: str,
     data_source_name: str,
-) -> gx:
+) -> None:
     """
     Validates input expectation suite expectations against curated version of
     an input JSON file returning full validation results
@@ -280,10 +309,6 @@ def validate_curated_flat_structure(
         json_file_name (str): input JSON file name
         expectation_suite_name (str): input expectation suite name
         data_source_name (str): input data source name
-
-    Returns:
-        gx: great_expectations validator results
-
     """
 
     # Convert pl Dataframe to pd Dataframe for gx integration
