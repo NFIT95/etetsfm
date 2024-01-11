@@ -11,10 +11,12 @@ from data_pipeline.extractor import extract_json_lines_from_json_file
 from data_pipeline.params import json_files_validators
 from data_pipeline.curator import create_curated_flat_structure
 from data_pipeline.writer import write_data_to_file
+from data_pipeline.reader import read_data_from_file
 
 
 def main():
     """Main entry point"""
+    
     # Initiate gx objects
     context = create_gx_filesystem_context()
     create_gx_expectations_suites(context, settings.expectation_suites_names)
@@ -53,6 +55,11 @@ def main():
             file_name=json_file_name,
             file_type="parquet",
             write_method="write_parquet",
+        )
+        curated_flat_structure = read_data_from_file(
+            folder_name="curated_data",
+            file_name=json_file_name,
+            file_type="parquet",
         )
 
     print(f"FANTASTIC JOB {settings.sample_setting}")
