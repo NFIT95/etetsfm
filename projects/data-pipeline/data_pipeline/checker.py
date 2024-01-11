@@ -1,13 +1,21 @@
 """Checker module to define data quality checks via in-memory gx"""
 
+import sys
+
 import great_expectations as gx
 import pandas as pd
 import polars as pl
-import sys
 from great_expectations.data_context import FileDataContext
 from pydantic import ValidationError
 
-from data_pipeline.params import JsonLinesStorage, SalesExpectationsStorage, ProductsExpectationsStorage, OrdersExpectationsStorage, CustomersExpectationsStorage, CountriesExpectationsStorage
+from data_pipeline.params import (
+    CountriesExpectationsStorage,
+    CustomersExpectationsStorage,
+    JsonLinesStorage,
+    OrdersExpectationsStorage,
+    ProductsExpectationsStorage,
+    SalesExpectationsStorage,
+)
 
 GX_DATA_CONTEXT_FOLDER = "tools/gx/data_context"
 
@@ -30,7 +38,7 @@ def check_json_lines(
         or a list of JSON lines with an un-validated JSON schema
     """
     json_lines_storage = JsonLinesStorage()
-    
+
     for extracted_json_line in extracted_json_lines:
         try:
             # Store valid JSON line
@@ -290,18 +298,33 @@ def validate_curated_flat_structure(
     validator = _create_gx_validator(context, batch_request, expectation_suite_name)
 
     validation_specs = {
-        "sales": {"expectations_storage": SalesExpectationsStorage, "validator_function": _validate_gx_sales_curated_expectations},
-        "products": {"expectations_storage": ProductsExpectationsStorage, "validator_function": _validate_gx_products_curated_expectations},
-        "orders": {"expectations_storage": OrdersExpectationsStorage, "validator_function": _validate_gx_orders_curated_expectations},
-        "customers": {"expectations_storage": CustomersExpectationsStorage, "validator_function": _validate_gx_customers_curated_expectations},
-        "countries": {"expectations_storage": CountriesExpectationsStorage, "validator_function": _validate_gx_countries_curated_expectations},
+        "sales": {
+            "expectations_storage": SalesExpectationsStorage,
+            "validator_function": _validate_gx_sales_curated_expectations,
+        },
+        "products": {
+            "expectations_storage": ProductsExpectationsStorage,
+            "validator_function": _validate_gx_products_curated_expectations,
+        },
+        "orders": {
+            "expectations_storage": OrdersExpectationsStorage,
+            "validator_function": _validate_gx_orders_curated_expectations,
+        },
+        "customers": {
+            "expectations_storage": CustomersExpectationsStorage,
+            "validator_function": _validate_gx_customers_curated_expectations,
+        },
+        "countries": {
+            "expectations_storage": CountriesExpectationsStorage,
+            "validator_function": _validate_gx_countries_curated_expectations,
+        },
     }
 
     if json_file_name in validation_specs:
         validation_results = validation_specs[json_file_name]["validator_function"](
             validator, validation_specs[json_file_name]["expectations_storage"]
         )
-        
+
     if not validation_results:
         print(
             f"""Validation unsuccessful. Curated data related to {json_file_name}

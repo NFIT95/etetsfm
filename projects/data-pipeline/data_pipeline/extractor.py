@@ -53,9 +53,7 @@ def _rename_keys(json_line: dict) -> dict:
     return renamed_json_line
 
 
-def extract_json_lines_from_json_file(
-    json_file_name: str
-) -> list[dict]:
+def extract_json_lines_from_json_file(json_file_name: str) -> list[dict]:
     """
     Extract data from a JSON file with one JSON object per line
 
@@ -67,7 +65,7 @@ def extract_json_lines_from_json_file(
         extracted_json_lines (list[dict]): list of input JSON file clean lines
     """
     json_lines_storage = JsonLinesStorage()
-    
+
     cleaning_functions = [
         _remove_final_comma,
         _rename_keys,

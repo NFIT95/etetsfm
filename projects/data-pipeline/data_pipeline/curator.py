@@ -2,7 +2,6 @@
 
 from datetime import datetime
 
-import great_expectations as gx
 import polars as pl
 
 
@@ -77,7 +76,7 @@ def _round_float_columns(flat_structure_to_curate: pl.DataFrame) -> pl.DataFrame
 
 
 def create_curated_flat_structure(
-    flat_structure_to_curate: pl.DataFrame
+    flat_structure_to_curate: pl.DataFrame,
 ) -> pl.DataFrame:
     """
     Applies curation, data validation, and materializes curated data to parquet files.
