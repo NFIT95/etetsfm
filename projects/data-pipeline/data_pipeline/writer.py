@@ -1,10 +1,9 @@
 """Writer module to write data to physical files"""
 
 from datetime import datetime
+from data_pipeline.params import DATA_ROOT_FOLDER
 
 import polars as pl
-
-DATA_ROOT_FOLDER = "data"
 
 
 def write_data_to_file(
@@ -15,7 +14,7 @@ def write_data_to_file(
     write_method: str,
 ) -> None:
     """
-    Writes a pandas dataframe to a physical file, with the file type
+    Writes a polars dataframe to a physical file, with the file type
     being either csv or parquet
 
     Args:
