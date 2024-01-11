@@ -26,7 +26,8 @@ def check_json_lines(
     json_files_validators: dict,
 ) -> dict:
     """
-    Returns a given JSON line schema validator depending on the input JSON file
+    Returns a dictionary with two polars Dataframe, one that includes valid
+    input JSON file lines, one that include broken input JSON file lines
 
     Args:
         extracted_json_lines (list[dict]): list of input JSON file lines
