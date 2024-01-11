@@ -6,6 +6,8 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 
 
+DATA_ROOT_FOLDER = "data"
+
 class SalesSchema(BaseModel):
     """Sales JSON file schema"""
 
