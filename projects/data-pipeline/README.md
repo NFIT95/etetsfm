@@ -11,7 +11,7 @@ Current modules go in this direction:
 - writer -> main
 - curator -> main
 - settings -> main
-- params -> extractor, checker, writer, reader , main
+- params -> extractor, checker, writer, reader, main
 
 Thank you
 Nicola
