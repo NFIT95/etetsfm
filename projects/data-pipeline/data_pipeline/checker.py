@@ -1,118 +1,50 @@
 """Checker module to define data quality checks via in-memory gx"""
 
-from dataclasses import dataclass, field
-from typing import List
-
 import great_expectations as gx
 import pandas as pd
+import polars as pl
+import sys
 from great_expectations.data_context import FileDataContext
+from pydantic import ValidationError
+
+from data_pipeline.params import JsonLinesStorage, SalesExpectationsStorage, ProductsExpectationsStorage, OrdersExpectationsStorage, CustomersExpectationsStorage, CountriesExpectationsStorage
 
 GX_DATA_CONTEXT_FOLDER = "tools/gx/data_context"
 
 
-@dataclass
-class SalesExpectationsStorage:
-    """Storage for sales data expectations"""
+def check_json_lines(
+    extracted_json_lines: list[dict],
+    json_file_name: str,
+    json_files_validators: dict,
+) -> dict:
+    """
+    Returns a given JSON line schema validator depending on the input JSON file
 
-    columns_to_exist_and_be_not_null: List[str] = field(
-        default_factory=lambda: [
-            "SaleId",
-            "OrderId",
-            "ProductId",
-            "Quantity",
-            "CreatedTimeStamp",
-        ]
-    )
-    columns_to_be_unique: List[str] = field(default_factory=lambda: ["SaleId"])
+    Args:
+        json_file_name (str): input JSON file name
+        json_line (dict): input JSON file name line
+        json_lines_storage: dataclass object with lists to store validated and broken data
 
+    Returns:
+        json_lines_storage (list[dict]): either a list of JSON lines with a validated schema
+        or a list of JSON lines with an un-validated JSON schema
+    """
+    json_lines_storage = JsonLinesStorage()
+    
+    for extracted_json_line in extracted_json_lines:
+        try:
+            # Store valid JSON line
+            json_files_validators[json_file_name](**extracted_json_line)
+            json_lines_storage.valid_json_lines.append(extracted_json_line)
+        except ValidationError:
+            # Store broken JSON line
+            print("Incorrect schema in JSON line: ", ValidationError)
+            json_lines_storage.broken_json_lines.append(extracted_json_line)
 
-@dataclass
-class ProductsExpectationsStorage:
-    """Storage for products data expectations"""
-
-    columns_to_exist_and_be_not_null: List[str] = field(
-        default_factory=lambda: [
-            "ProductId",
-            "Name",
-            "ManufacturedCountry",
-            "WeightGrams",
-            "CreatedTimeStamp",
-        ]
-    )
-    columns_to_be_unique: List[str] = field(
-        default_factory=lambda: ["ProductId", "Name"]
-    )
-    columns_with_length_equal_to: List[str] = field(
-        default_factory=lambda: ["ManufacturedCountry"]
-    )
-
-
-@dataclass
-class OrdersExpectationsStorage:
-    """Storage for orders data expectations"""
-
-    columns_to_exist_and_be_not_null: List[str] = field(
-        default_factory=lambda: ["OrderId", "CustomerId", "Date", "CreatedTimeStamp"]
-    )
-    columns_to_be_unique: List[str] = field(default_factory=lambda: ["OrderId"])
-
-
-@dataclass
-class CustomersExpectationsStorage:
-    """Storage for customers data expectations"""
-
-    columns_to_exist_and_be_not_null: List[str] = field(
-        default_factory=lambda: [
-            "CustomerId",
-            "Active",
-            "Name",
-            "Address",
-            "City",
-            "Country",
-            "Email",
-            "CreatedTimeStamp",
-        ]
-    )
-    columns_to_be_unique: List[str] = field(default_factory=lambda: ["CustomerId"])
-    columns_with_length_equal_to: List[str] = field(default_factory=lambda: ["Country"])
-
-
-@dataclass
-class CountriesExpectationsStorage:
-    """Storage for countries data expectations"""
-
-    columns_to_exist_and_be_not_null: List[str] = field(
-        default_factory=lambda: [
-            "Country",
-            "Currency",
-            "Name",
-            "Region",
-            "Population",
-            "AreaSqMi",
-            "PopDensityPerSqMi",
-            "CoastlineCoastPerAreaRatio",
-            "NetMigration",
-            "InfantMortalityPer1000Births",
-            "GDPPerCapita",
-            "Literacy",
-            "PhonesPer1000",
-            "Arable",
-            "Crops",
-            "Other",
-            "Climate",
-            "Birthrate",
-            "Deathrate",
-            "Agriculture",
-            "Industry",
-            "Service",
-            "CreatedTimeStamp",
-        ]
-    )
-    columns_to_be_unique: List[str] = field(default_factory=lambda: ["Country"])
-    columns_with_length_equal_to: List[str] = field(
-        default_factory=lambda: ["Country", "Currency"]
-    )
-    lengths_checks: List[int] = field(default_factory=lambda: [2, 3])
+    return {
+        "valid_json_lines": pl.DataFrame(json_lines_storage.valid_json_lines),
+        "broken_json_lines": pl.DataFrame(json_lines_storage.broken_json_lines),
+    }
 
 
 def create_gx_filesystem_context() -> gx.DataContext:
@@ -346,34 +278,33 @@ def validate_curated_flat_structure(
 
     """
 
+    # Convert pl Dataframe to pd Dataframe for gx integration
+    flat_structure = flat_structure.to_pandas()
+
     batch_request = _create_gx_batch_request(
         context.get_datasource(data_source_name), json_file_name, flat_structure
     )
 
+    print(batch_request.dict())
+
     validator = _create_gx_validator(context, batch_request, expectation_suite_name)
 
-    expectations_storages = {
-        "sales": SalesExpectationsStorage,
-        "products": ProductsExpectationsStorage,
-        "orders": OrdersExpectationsStorage,
-        "customers": CustomersExpectationsStorage,
-        "countries": CountriesExpectationsStorage,
+    validation_specs = {
+        "sales": {"expectations_storage": SalesExpectationsStorage, "validator_function": _validate_gx_sales_curated_expectations},
+        "products": {"expectations_storage": ProductsExpectationsStorage, "validator_function": _validate_gx_products_curated_expectations},
+        "orders": {"expectations_storage": OrdersExpectationsStorage, "validator_function": _validate_gx_orders_curated_expectations},
+        "customers": {"expectations_storage": CustomersExpectationsStorage, "validator_function": _validate_gx_customers_curated_expectations},
+        "countries": {"expectations_storage": CountriesExpectationsStorage, "validator_function": _validate_gx_countries_curated_expectations},
     }
 
-    validator_functions = {
-        "sales": _validate_gx_sales_curated_expectations,
-        "products": _validate_gx_products_curated_expectations,
-        "orders": _validate_gx_orders_curated_expectations,
-        "customers": _validate_gx_customers_curated_expectations,
-        "countries": _validate_gx_countries_curated_expectations,
-    }
-
-    if (
-        json_file_name in expectations_storages
-        and json_file_name in validator_functions
-    ):
-        validation_results = validator_functions[json_file_name](
-            validator, expectations_storages[json_file_name]
+    if json_file_name in validation_specs:
+        validation_results = validation_specs[json_file_name]["validator_function"](
+            validator, validation_specs[json_file_name]["expectations_storage"]
         )
-
-    return validation_results
+        
+    if not validation_results:
+        print(
+            f"""Validation unsuccessful. Curated data related to {json_file_name}
+            does not match expectations. Stopping execution now."""
+        )
+        sys.exit()

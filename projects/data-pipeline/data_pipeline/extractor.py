@@ -2,83 +2,8 @@
 
 import json
 import re
-from dataclasses import dataclass, field
-from typing import List, Optional
 
-from pydantic import BaseModel, Field, ValidationError
-
-
-class SalesSchema(BaseModel):
-    """Sales JSON file schema"""
-
-    SaleId: int = Field(strict=True)
-    OrderId: int = Field(strict=True)
-    ProductId: int = Field(strict=True)
-    Quantity: int = Field(strict=True)
-
-
-class ProductsSchema(BaseModel):
-    """Products JSON file schema"""
-
-    ProductId: int = Field(strict=True)
-    Name: str = Field(strict=True)
-    ManufacturedCountry: str = Field(strict=True)
-    WeightGrams: int = Field(strict=True)
-
-
-class OrdersSchema(BaseModel):
-    """Orders JSON file schema"""
-
-    OrderId: int = Field(strict=True)
-    CustomerId: int = Field(strict=True)
-    Date: str = Field(strict=True)
-
-
-class CustomersSchema(BaseModel):
-    """Customers JSON file schema"""
-
-    CustomerId: int = Field(strict=True)
-    Active: bool = Field(strict=True)
-    Name: str = Field(strict=True)
-    Address: str = Field(strict=True)
-    City: str = Field(strict=True)
-    Country: str = Field(strict=True)
-    Email: str = Field(strict=True)
-
-
-class CountriesSchema(BaseModel):
-    """Countries JSON file schema"""
-
-    Country: str = Field(strict=True)
-    Currency: str = Field(strict=True)
-    Name: str = Field(strict=True)
-    Region: str = Field(strict=True)
-    Population: int = Field(strict=True)
-    AreaSqMi: Optional[float]
-    PopDensityPerSqMi: Optional[float]
-    CoastlineCoastPerAreaRatio: Optional[float]
-    NetMigration: Optional[float]
-    InfantMortalityPer1000Births: Optional[float]
-    GDPPerCapita: Optional[float]
-    Literacy: Optional[float]
-    PhonesPer1000: Optional[float]
-    Arable: Optional[float]
-    Crops: Optional[float]
-    Other: Optional[float]
-    Climate: Optional[float]
-    Birthrate: Optional[float]
-    Deathrate: Optional[float]
-    Agriculture: Optional[float]
-    Industry: Optional[float]
-    Service: Optional[float]
-
-
-@dataclass
-class Storage:
-    """General data storage for validated and broken JSON lines"""
-
-    json_lines: List[dict] = field(default_factory=list)
-    json_lines_broken: List[dict] = field(default_factory=list)
+from data_pipeline.params import JsonLinesStorage
 
 
 def _remove_final_comma(json_line: dict) -> dict:
@@ -128,54 +53,21 @@ def _rename_keys(json_line: dict) -> dict:
     return renamed_json_line
 
 
-def _validate_json_line_schema(
-    json_file_name: str, json_line: dict, storage: Storage
-) -> BaseModel:
-    """
-    Returns a given JSON line schema validator depending on the input JSON file
-
-    Args:
-        json_file_name (str): input JSON file name
-        json_line (dict): input JSON file name line
-        storage: dataclass object with lists to store validated and broken data
-
-    Returns:
-        BaseModel: input JSON file specific Pydantic validator
-    """
-    validators = {
-        "sales": SalesSchema,
-        "products": ProductsSchema,
-        "orders": OrdersSchema,
-        "customers": CustomersSchema,
-        "countries": CountriesSchema,
-    }
-
-    try:
-        validators[json_file_name](**json_line)
-        storage.json_lines.append(json_line)
-        return storage.json_lines
-    except ValidationError:
-        print("Incorrect schema in JSON line: ", ValidationError)
-        storage.json_lines_broken.append(json_line)
-        return storage.json_lines_broken
-
-
-def extract_data_from_json_file(
-    json_file_name: str, storage: Storage = Storage
-) -> (list[dict], list[dict]):
+def extract_json_lines_from_json_file(
+    json_file_name: str
+) -> list[dict]:
     """
     Extract data from a JSON file with one JSON object per line
 
     Args:
         json_file_name (str): input JSON file name
-        storage: dataclass object with lists to store validated and broken data
+        json_lines_storage: dataclass object with lists to store json lines
 
     Returns:
-        json_lines (list[dict]): list of input JSON file lines with a validated schema
-        json_lines_broken (list[dict]): list of input JSON file lines without a validated schema
+        extracted_json_lines (list[dict]): list of input JSON file clean lines
     """
-    storage = Storage()
-
+    json_lines_storage = JsonLinesStorage()
+    
     cleaning_functions = [
         _remove_final_comma,
         _rename_keys,
@@ -187,7 +79,6 @@ def extract_data_from_json_file(
         for json_line in json_file:
             for cleaning_function in cleaning_functions:
                 json_line = cleaning_function(json_line)
+            json_lines_storage.extracted_json_lines.append(json_line)
 
-            _validate_json_line_schema(json_file_name, json_line, storage)
-
-    return storage.json_lines, storage.json_lines_broken
+    return json_lines_storage.extracted_json_lines

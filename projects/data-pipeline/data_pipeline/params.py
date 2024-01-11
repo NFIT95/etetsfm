@@ -47,11 +47,11 @@ class CustomersSchema(BaseModel):
 class CountriesSchema(BaseModel):
     """Countries JSON file schema"""
 
-    Country: str = Field(strict=True)
-    Currency: str = Field(strict=True)
-    Name: str = Field(strict=True)
-    Region: str = Field(strict=True)
-    Population: int = Field(strict=True)
+    Country: str
+    Currency: str
+    Name: str
+    Region: str
+    Population: int
     AreaSqMi: Optional[float]
     PopDensityPerSqMi: Optional[float]
     CoastlineCoastPerAreaRatio: Optional[float]
@@ -73,10 +73,11 @@ class CountriesSchema(BaseModel):
 
 @dataclass
 class JsonLinesStorage:
-    """General data storage for validated and broken JSON lines"""
+    """General data storage for JSON files lines"""
 
-    json_lines: List[dict] = field(default_factory=list)
-    json_lines_broken: List[dict] = field(default_factory=list)
+    extracted_json_lines: List[dict] = field(default_factory=lambda: [])
+    valid_json_lines: List[dict] = field(default_factory=lambda: [])
+    broken_json_lines: List[dict] = field(default_factory=lambda: [])
 
 
 json_files_validators = {
@@ -86,3 +87,108 @@ json_files_validators = {
     "customers": CustomersSchema,
     "countries": CountriesSchema,
 }
+
+
+@dataclass
+class SalesExpectationsStorage:
+    """Storage for sales data expectations"""
+
+    columns_to_exist_and_be_not_null: List[str] = field(
+        default_factory=lambda: [
+            "SaleId",
+            "OrderId",
+            "ProductId",
+            "Quantity",
+            "CreatedTimeStamp",
+        ]
+    )
+    columns_to_be_unique: List[str] = field(default_factory=lambda: ["SaleId"])
+
+
+@dataclass
+class ProductsExpectationsStorage:
+    """Storage for products data expectations"""
+
+    columns_to_exist_and_be_not_null: List[str] = field(
+        default_factory=lambda: [
+            "ProductId",
+            "Name",
+            "ManufacturedCountry",
+            "WeightGrams",
+            "CreatedTimeStamp",
+        ]
+    )
+    columns_to_be_unique: List[str] = field(
+        default_factory=lambda: ["ProductId", "Name"]
+    )
+    columns_with_length_equal_to: List[str] = field(
+        default_factory=lambda: ["ManufacturedCountry"]
+    )
+
+
+@dataclass
+class OrdersExpectationsStorage:
+    """Storage for orders data expectations"""
+
+    columns_to_exist_and_be_not_null: List[str] = field(
+        default_factory=lambda: ["OrderId", "CustomerId", "Date", "CreatedTimeStamp"]
+    )
+    columns_to_be_unique: List[str] = field(default_factory=lambda: ["OrderId"])
+
+
+@dataclass
+class CustomersExpectationsStorage:
+    """Storage for customers data expectations"""
+
+    columns_to_exist_and_be_not_null: List[str] = field(
+        default_factory=lambda: [
+            "CustomerId",
+            "Active",
+            "Name",
+            "Address",
+            "City",
+            "Country",
+            "Email",
+            "CreatedTimeStamp",
+        ]
+    )
+    columns_to_be_unique: List[str] = field(default_factory=lambda: ["CustomerId"])
+    columns_with_length_equal_to: List[str] = field(default_factory=lambda: ["Country"])
+
+
+@dataclass
+class CountriesExpectationsStorage:
+    """Storage for countries data expectations"""
+
+    columns_to_exist_and_be_not_null: List[str] = field(
+        default_factory=lambda: [
+            "Country",
+            "Currency",
+            "Name",
+            "Region",
+            "Population",
+            "AreaSqMi",
+            "PopDensityPerSqMi",
+            "CoastlineCoastPerAreaRatio",
+            "NetMigration",
+            "InfantMortalityPer1000Births",
+            "GDPPerCapita",
+            "Literacy",
+            "PhonesPer1000",
+            "Arable",
+            "Crops",
+            "Other",
+            "Climate",
+            "Birthrate",
+            "Deathrate",
+            "Agriculture",
+            "Industry",
+            "Service",
+            "CreatedTimeStamp",
+        ]
+    )
+    columns_to_be_unique: List[str] = field(default_factory=lambda: ["Country"])
+    columns_with_length_equal_to: List[str] = field(
+        default_factory=lambda: ["Country", "Currency"]
+    )
+    lengths_checks: List[int] = field(default_factory=lambda: [2, 3])

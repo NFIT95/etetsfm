@@ -5,27 +5,6 @@ from datetime import datetime
 import great_expectations as gx
 import polars as pl
 
-from data_pipeline.checker import validate_curated_flat_structure
-from data_pipeline.extractor import extract_data_from_json_file
-from data_pipeline.writer import write_data_to_file
-
-
-def _create_flat_structure_to_curate(json_file_name: str) -> pl.DataFrame:
-    """
-    Create a flat structure starting from data extracted from a JSON file
-
-    Args:
-        json_file_name (str): name of the input jSON file
-
-    Returns:
-        flat_structure_to_curate (pl.DataFrame): Polars dataframe with raw data
-    """
-    flat_structure_to_curate = pl.DataFrame(
-        extract_data_from_json_file(json_file_name)[0]
-    )
-
-    return flat_structure_to_curate
-
 
 def _add_timestamp_column(flat_structure_to_curate: pl.DataFrame) -> pl.DataFrame:
     """
@@ -78,20 +57,6 @@ def _fill_nulls_in_columns(
     return flat_structure_to_curate
 
 
-def _drop_duplicates(flat_structure_to_curate: pl.DataFrame) -> pl.DataFrame:
-    """
-    Drop duplicates in the input Polars dataframe.
-
-    Args:
-        flat_structure_to_curate (pl.DataFrame): Polars dataframe with raw data
-
-    Returns:
-        flat_structure_to_curate (pl.DataFrame): Polars dataframe without duplicates
-    """
-    flat_structure_to_curate = flat_structure_to_curate.unique()
-    return flat_structure_to_curate
-
-
 def _round_float_columns(flat_structure_to_curate: pl.DataFrame) -> pl.DataFrame:
     """
     Round float columns in the input Polars dataframe to 2 decimal places.
@@ -111,12 +76,9 @@ def _round_float_columns(flat_structure_to_curate: pl.DataFrame) -> pl.DataFrame
     return flat_structure_to_curate
 
 
-def materialize_curated_flat_structures(
-    context: gx.DataContext,
-    json_files_names: str,
-    expectation_suite_name: str,
-    data_source_name: str,
-) -> None:
+def create_curated_flat_structure(
+    flat_structure_to_curate: pl.DataFrame
+) -> pl.DataFrame:
     """
     Applies curation, data validation, and materializes curated data to parquet files.
 
@@ -126,37 +88,16 @@ def materialize_curated_flat_structures(
         expectation_suite_name (str): name of the input expectation suite
         data_source_name (str): name of the input data source
     """
-    for json_file_name in json_files_names:
-        flat_structure_to_curate = _create_flat_structure_to_curate(json_file_name)
 
-        curating_functions = [
-            _add_timestamp_column,
-            _fill_nulls_in_columns,
-            _round_float_columns,
-            _drop_duplicates,
-        ]
+    curating_functions = [
+        _add_timestamp_column,
+        _fill_nulls_in_columns,
+        _round_float_columns,
+    ]
 
-        for curating_function in curating_functions:
-            flat_structure_to_curate = curating_function(flat_structure_to_curate)
+    for curating_function in curating_functions:
+        flat_structure_to_curate = curating_function(flat_structure_to_curate)
 
-        # Convert polars df to pandas df for gx integration
-        curated_flat_structure = flat_structure_to_curate.to_pandas()
+    curated_flat_structure = getattr(flat_structure_to_curate, "unique")()
 
-        validation_results = validate_curated_flat_structure(
-            curated_flat_structure,
-            context,
-            json_file_name,
-            expectation_suite_name,
-            data_source_name,
-        )
-
-        if not validation_results:
-            print(
-                f"""Validation unsuccessful. Curated data related to {json_file_name}
-                does not match expectations. Stopping execution now."""
-            )
-            break
-
-        write_data_to_file(
-            curated_flat_structure, "curated_data", json_file_name, "parquet"
-        )
+    return curated_flat_structure

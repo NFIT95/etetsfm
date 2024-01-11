@@ -2,13 +2,17 @@
 
 from datetime import datetime
 
-import pandas as pd
+import polars as pl
 
 DATA_ROOT_FOLDER = "data"
 
 
 def write_data_to_file(
-    flat_structure: pd.DataFrame, folder_name: str, file_name: str, file_type: str
+    flat_structure: pl.DataFrame,
+    folder_name: str,
+    file_name: str,
+    file_type: str,
+    write_method: str,
 ) -> None:
     """
     Writes a pandas dataframe to a physical file, with the file type
@@ -21,8 +25,4 @@ def write_data_to_file(
         file_type (str): type of file that will be written, either csv or parquet
     """
     output_path = f"{DATA_ROOT_FOLDER}/{folder_name}/{str(datetime.now())}_{file_name}.{file_type}"
-    match file_type:
-        case "csv":
-            flat_structure.to_csv(output_path)
-        case "parquet":
-            flat_structure.to_parquet(output_path)
+    return getattr(flat_structure, write_method)(output_path)

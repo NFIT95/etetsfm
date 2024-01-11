@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     """Base settings object"""
 
     sample_setting: str = "Nicola Filosi"
-    files_names: list[str] = ["sales", "customers", "products", "orders", "countries"]
+    json_files_names: list[str] = ["sales", "customers", "products", "orders", "countries"]
     expectation_suites_names: list[str] = [
         "curated_flat_structure_suite",
         "clean_flat_structure_suite",
