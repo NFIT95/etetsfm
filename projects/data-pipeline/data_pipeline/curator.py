@@ -82,10 +82,10 @@ def create_curated_flat_structure(
     Applies curation, data validation, and materializes curated data to parquet files.
 
     Args:
-        context (gx.DataContext): great_expectations FileSystem DataContext
-        json_files_names (str): list of JSON file names to curate
-        expectation_suite_name (str): name of the input expectation suite
-        data_source_name (str): name of the input data source
+        flat_structure_to_curate (pl.DataFrame): Polars dataframe with raw data
+
+    Returns:
+        curated_flat_structure (pl.DataFrame): Polars dataframe with curated data
     """
 
     curating_functions = [
