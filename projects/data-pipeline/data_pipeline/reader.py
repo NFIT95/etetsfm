@@ -18,6 +18,7 @@ def read_data_from_file(
         folder_name (str): name of the folder where the file will be written
         file_name (str): name of the file that will be written
         file_type (str): type of file that will be written, either csv or parquet
+        read_method (str): method that will be used to read the data from a file
 
     Returns:
         flat_structure (pl.DataFrame): polars dataframe with file data
@@ -36,8 +37,6 @@ def read_data_from_file(
     # Pick file with the latest timestamp from files_to_sort
     sorted_files = sorted(files_to_sort, reverse=True, key=lambda x: x.split("_")[0])
     input_file_path = f"{dir_path}/{sorted_files[0]}"
-    
-    #flat_structure = pl.read_parquet(input_file_path)
     
     flat_structure = getattr(pl, read_method)(input_file_path)
     
