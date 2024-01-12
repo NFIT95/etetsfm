@@ -166,9 +166,9 @@ def create_consumable_flat_structure(
 
     # Rename columns
     for json_file_name, curated_flat_structure in curated_flat_structures.items():
-        column_prefix = _create_column_prefix(json_file_name)
+        column_prefix = _create_column_prefix(json_file_name=json_file_name)
         columns_renaming = _create_columns_renaming(
-            column_prefix, curated_flat_structure, columns_renaming
+            column_prefix=column_prefix, curated_flat_structure=curated_flat_structure, columns_renaming=columns_renaming
         )
         curated_flat_structures[json_file_name] = curated_flat_structure.rename(
             columns_renaming
