@@ -3,39 +3,43 @@
 import polars as pl
 
 
-def _rename_curated_flat_structures_columns(curated_flat_structures: dict) -> dict:
+def _create_column_prefix(json_file_name: str) -> str:
     """
-    Rename columns in curated flat structures
-
+    Create column prefix based on json file name for column renaming
+    
     Args:
-        curated_flat_structures (dict): curated flat structures with non renamed columns
-
+        json_file_name (str): json file name
+        
     Returns:
-        curated_flat_structures (dict): curated flat structures with renamed columns
+        column_prefix (str): column prefix
     """
-    renaming_dictionary = {}
+    column_prefix = json_file_name.capitalize()[:-1]
+    match json_file_name:
+        case "countries":
+            column_prefix = "country".capitalize()
 
-    for json_file_name, curated_flat_structure in curated_flat_structures.items():
-        # Create new column name
-        column_prefix = json_file_name.capitalize()[:-1]
-        match json_file_name:
-            case "countries":
-                column_prefix = "country".capitalize()
-        # Create new dict with old and new column name per each dataframe
-        for column in curated_flat_structure.columns:
-            renaming_dictionary[column] = column_prefix + column
-        # Rename columns
-        curated_flat_structures[json_file_name] = curated_flat_structure.rename(
-            renaming_dictionary
-        )
-        renaming_dictionary = {}
+    return column_prefix
 
-    # Special case of renaming column
-    curated_flat_structures["sales"] = curated_flat_structures["sales"].rename(
-        {"SaleSaleId": "SaleId"}
-    )
 
-    return curated_flat_structures
+def _create_columns_renaming(
+    column_prefix: str, curated_flat_structure: dict, columns_renaming: dict
+) -> dict:
+    """
+    Create a mapping between old columns names and new columns names
+    
+    Args:
+        column_prefix (str): column prefix
+        curated_flat_structure (dict): curated flat structure
+        columns_renaming (dict): empty between old columns names and new columns names
+        
+    Returns:
+        columns_renaming (dict): updated mapping between old columns names and 
+        new columns names
+    """
+    for column in curated_flat_structure.columns:
+        columns_renaming[column] = column_prefix + column
+
+    return columns_renaming
 
 
 def _join_curated_flat_structures(
@@ -50,31 +54,33 @@ def _join_curated_flat_structures(
     Returns:
         joined_flat_structure (pl.DataFrame): joined flat structure
     """
+    join_method = "left"
+
     joined_flat_structure = (
         curated_flat_structures["sales"]
         .join(
             other=curated_flat_structures["products"],
             left_on="SaleProductId",
             right_on="ProductProductId",
-            how="left",
+            how=join_method,
         )
         .join(
             other=curated_flat_structures["orders"],
             left_on="SaleOrderId",
             right_on="OrderOrderId",
-            how="left",
+            how=join_method,
         )
         .join(
             other=curated_flat_structures["customers"],
             left_on="OrderCustomerId",
             right_on="CustomerCustomerId",
-            how="left",
+            how=join_method,
         )
         .join(
             other=curated_flat_structures["countries"],
             left_on="CustomerCountry",
             right_on="CountryCountry",
-            how="left",
+            how=join_method,
         )
     )
 
@@ -156,14 +162,28 @@ def create_consumable_flat_structure(
     Returns
         consumable_flat_structure (pl.DataFrame): consumable flat structure
     """
-    renamed_curated_flat_structures = _rename_curated_flat_structures_columns(
-        curated_flat_structures
+    columns_renaming = {}
+
+    # Rename columns
+    for json_file_name, curated_flat_structure in curated_flat_structures.items():
+        column_prefix = _create_column_prefix(json_file_name)
+        columns_renaming = _create_columns_renaming(
+            column_prefix, curated_flat_structure, columns_renaming
+        )
+        curated_flat_structures[json_file_name] = curated_flat_structure.rename(
+            columns_renaming
+        )
+        columns_renaming = {}
+
+    # Special case of renaming column
+    curated_flat_structures["sales"] = curated_flat_structures["sales"].rename(
+        {"SaleSaleId": "SaleId"}
     )
 
-    joined_flat_structure = _join_curated_flat_structures(
-        renamed_curated_flat_structures
-    )
+    # Join flat structures
+    joined_flat_structure = _join_curated_flat_structures(curated_flat_structures)
 
+    # Add features
     add_feature_functions = [
         _add_feature_country_percentage_of_total_quantity,
         _add_feature_product_weight_grams_per_sale_quantity,
@@ -172,6 +192,7 @@ def create_consumable_flat_structure(
     for add_feature_function in add_feature_functions:
         joined_flat_structure = add_feature_function(joined_flat_structure)
 
+    # Select columns
     consumable_flat_structure = joined_flat_structure.select(attributes_to_select)
 
     return consumable_flat_structure
