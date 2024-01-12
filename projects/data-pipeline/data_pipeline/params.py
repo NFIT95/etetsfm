@@ -5,8 +5,56 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
-
 DATA_ROOT_FOLDER = "data"
+
+curated_flat_structures = {
+    "sales": None,
+    "products": None,
+    "orders": None,
+    "customers": None,
+    "countries": None,
+}
+
+
+attributes_to_select = [
+    "SaleId",
+    "SaleOrderId",
+    "SaleProductId",
+    "ProductName",
+    "ProductManufacturedCountry",
+    "CustomerName",
+    "CustomerAddress",
+    "CustomerCity",
+    "CustomerCountry",
+    "CustomerEmail",
+    "CountryCurrency",
+    "CountryName",
+    "CountryRegion",
+    "OrderDate",
+    "CustomerActive",
+    "CountryPopulation",
+    "CountryAreaSqMi",
+    "CountryPopDensityPerSqMi",
+    "CountryCoastlineCoastPerAreaRatio",
+    "CountryNetMigration",
+    "CountryInfantMortalityPer1000Births",
+    "CountryGDPPerCapita",
+    "CountryLiteracy",
+    "CountryPhonesPer1000",
+    "CountryArable",
+    "CountryCrops",
+    "CountryClimate",
+    "CountryBirthrate",
+    "CountryDeathrate",
+    "CountryAgriculture",
+    "CountryIndustry",
+    "CountryService",
+    "ProductWeightGrams",
+    "SaleQuantity",
+    "CountryPercentageOfTotalQuantity",
+    "ProductWeightGramsPerSaleQuantity",
+]
+
 
 class SalesSchema(BaseModel):
     """Sales JSON file schema"""
