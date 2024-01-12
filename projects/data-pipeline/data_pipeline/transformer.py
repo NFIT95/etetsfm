@@ -6,10 +6,10 @@ import polars as pl
 def _create_column_prefix(json_file_name: str) -> str:
     """
     Create column prefix based on json file name for column renaming
-    
+
     Args:
         json_file_name (str): json file name
-        
+
     Returns:
         column_prefix (str): column prefix
     """
@@ -26,14 +26,14 @@ def _create_columns_renaming(
 ) -> dict:
     """
     Create a mapping between old columns names and new columns names
-    
+
     Args:
         column_prefix (str): column prefix
         curated_flat_structure (dict): curated flat structure
         columns_renaming (dict): empty between old columns names and new columns names
-        
+
     Returns:
-        columns_renaming (dict): updated mapping between old columns names and 
+        columns_renaming (dict): updated mapping between old columns names and
         new columns names
     """
     for column in curated_flat_structure.columns:
@@ -168,7 +168,9 @@ def create_consumable_flat_structure(
     for json_file_name, curated_flat_structure in curated_flat_structures.items():
         column_prefix = _create_column_prefix(json_file_name=json_file_name)
         columns_renaming = _create_columns_renaming(
-            column_prefix=column_prefix, curated_flat_structure=curated_flat_structure, columns_renaming=columns_renaming
+            column_prefix=column_prefix,
+            curated_flat_structure=curated_flat_structure,
+            columns_renaming=columns_renaming,
         )
         curated_flat_structures[json_file_name] = curated_flat_structure.rename(
             columns_renaming
