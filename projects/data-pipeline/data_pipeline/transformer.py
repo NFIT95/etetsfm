@@ -6,10 +6,10 @@ import polars as pl
 def _rename_curated_flat_structures_columns(curated_flat_structures: dict) -> dict:
     """
     Rename columns in curated flat structures
-    
+
     Args:
         curated_flat_structures (dict): curated flat structures with non renamed columns
-        
+
     Returns:
         curated_flat_structures (dict): curated flat structures with renamed columns
     """
@@ -24,7 +24,6 @@ def _rename_curated_flat_structures_columns(curated_flat_structures: dict) -> di
         # Create new dict with old and new column name per each dataframe
         for column in curated_flat_structure.columns:
             renaming_dictionary[column] = column_prefix + column
-
         # Rename columns
         curated_flat_structures[json_file_name] = curated_flat_structure.rename(
             renaming_dictionary
@@ -44,10 +43,10 @@ def _join_curated_flat_structures(
 ) -> pl.DataFrame:
     """
     Join all curated flat structures into a single flat structure
-    
+
     Args:
         curated_flat_structures (dict): curated flat structures
-        
+
     Returns:
         joined_flat_structure (pl.DataFrame): joined flat structure
     """
@@ -87,16 +86,20 @@ def _add_feature_country_percentage_of_total_quantity(
 ) -> pl.DataFrame:
     """
     Add feature country percentage of total quantity to joined_flat_structure
-    
+
     Args:
         joined_flat_structure (pl.DataFrame): joined flat structure without
         country percentage of total quantity feature
-    
+
     Returns:
-        joined_flat_structure (pl.DataFrame): joined flat structure with 
+        joined_flat_structure (pl.DataFrame): joined flat structure with
         country percentage of total quantity feature
     """
-    grouping_column, numerator, denominator = "CountryName", "SaleQuantity", "TotalSaleQuantityPerCountry"
+    grouping_column, numerator, denominator = (
+        "CountryName",
+        "SaleQuantity",
+        "TotalSaleQuantityPerCountry",
+    )
 
     joined_flat_structure = (
         joined_flat_structure.group_by(grouping_column)
@@ -122,11 +125,11 @@ def _add_feature_product_weight_grams_per_sale_quantity(
 ) -> pl.DataFrame:
     """
     Add feature product weight grams per sale quantity to joined_flat_structure
-    
+
     Args:
         joined_flat_structure (pl.DataFrame): joined flat structure without
         product weight grams per sale quantity feature
-        
+
     Returns:
         joined_flat_structure (pl.DataFrame): joined flat structure with
         product weight grams per sale quantity feature
@@ -145,11 +148,11 @@ def create_consumable_flat_structure(
 ) -> pl.DataFrame:
     """
     Create consumable flat structure with all features
-    
+
     Args:
         curated_flat_structures (dict): curated flat structures
         attributes_to_select (list[str]): attributes to select from joined flat structure
-        
+
     Returns
         consumable_flat_structure (pl.DataFrame): consumable flat structure
     """
@@ -169,8 +172,6 @@ def create_consumable_flat_structure(
     for add_feature_function in add_feature_functions:
         joined_flat_structure = add_feature_function(joined_flat_structure)
 
-    consumable_flat_structure = joined_flat_structure.select(
-        attributes_to_select
-    )
+    consumable_flat_structure = joined_flat_structure.select(attributes_to_select)
 
     return consumable_flat_structure
