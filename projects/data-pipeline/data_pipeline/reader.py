@@ -37,6 +37,8 @@ def read_data_from_file(
     sorted_files = sorted(files_to_sort, reverse=True, key=lambda x: x.split("_")[0])
     input_file_path = f"{dir_path}/{sorted_files[0]}"
     
-    flat_structure = pl.read_parquet(input_file_path)
+    #flat_structure = pl.read_parquet(input_file_path)
+    
+    flat_structure = getattr(pl, read_method)(input_file_path)
     
     return flat_structure
