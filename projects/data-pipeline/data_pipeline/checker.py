@@ -64,7 +64,6 @@ def create_gx_filesystem_context() -> gx.DataContext:
 
     Returns:
         context (gx.DataContext): great_expectations FileSystem DataContext
-
     """
     gx_data_context_folder_path = f"../{GX_DATA_CONTEXT_FOLDER}"
     context = FileDataContext.create(project_root_dir=gx_data_context_folder_path)
@@ -80,7 +79,6 @@ def create_gx_expectations_suites(
     Args:
         context (gx.DataContext): great_expectations FileSystem DataContext
         expectation_suites_names (str): list of expectation suite names to create
-
     """
     for expectation_suite_name in expectation_suites_names:
         context.add_or_update_expectation_suite(expectation_suite_name)
