@@ -317,8 +317,6 @@ def validate_curated_flat_structure(
         context.get_datasource(data_source_name), json_file_name, flat_structure
     )
 
-    print(batch_request.dict())
-
     validator = _create_gx_validator(context, batch_request, expectation_suite_name)
 
     validation_specs = {
