@@ -9,7 +9,7 @@ from ydata_profiling import ProfileReport
 from data_pipeline.params import DATA_ROOT_FOLDER
 
 
-def write_data_profile_report(flat_structure: pl.DataFrame, json_file_name: str) -> None:
+def write_data_profile_report(flat_structure: pl.DataFrame, file_name: str) -> None:
     """
     Creates html data profiling report for an input polars dataframe
     
@@ -21,8 +21,8 @@ def write_data_profile_report(flat_structure: pl.DataFrame, json_file_name: str)
     # Convert from polars to pandas dataframe for ydata-profiling integration
     pd_flat_structure = flat_structure.to_pandas()
 
-    profile = ProfileReport(pd_flat_structure, title=f"Profile Report of {json_file_name}")
+    profile = ProfileReport(pd_flat_structure, title=f"Profile Report of {file_name}")
     output_path = Path(
-        f"{DATA_ROOT_FOLDER}/data_profiles/{str(datetime.now())}_{json_file_name}.html"
+        f"{DATA_ROOT_FOLDER}/data_profiles/{str(datetime.now())}_{file_name}.html"
     )
     profile.to_file(output_file=output_path)
