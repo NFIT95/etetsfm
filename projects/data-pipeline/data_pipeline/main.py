@@ -65,7 +65,7 @@ def main():
         )
         write_data_profile_report(
             flat_structure=curated_flat_structure,
-            json_file_name=json_file_name
+            file_name=json_file_name
         )
 
     for json_file_name in settings.json_files_names:
@@ -88,7 +88,7 @@ def main():
     )
     write_data_profile_report(
         flat_structure=consumable_flat_structure,
-        json_file_name="analytics_base_table"
+        file_name="analytics_base_table"
     )
 
     print(f"FANTASTIC JOB {settings.sample_setting}")
