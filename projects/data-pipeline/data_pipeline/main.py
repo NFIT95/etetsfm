@@ -18,6 +18,7 @@ from data_pipeline.params import (
 from data_pipeline.reader import read_data_from_file
 from data_pipeline.transformer import create_consumable_flat_structure
 from data_pipeline.writer import write_data_to_file
+from data_pipeline.profiler import write_data_profile_report
 
 
 def main():
@@ -62,6 +63,10 @@ def main():
             file_type="parquet",
             write_method="write_parquet",
         )
+        write_data_profile_report(
+            flat_structure=curated_flat_structure,
+            json_file_name=json_file_name
+        )
 
     for json_file_name in settings.json_files_names:
         curated_flat_structures[json_file_name] = read_data_from_file(
@@ -70,7 +75,7 @@ def main():
             file_type="parquet",
             read_method="read_parquet",
         )
-
+        
     consumable_flat_structure = create_consumable_flat_structure(
         curated_flat_structures, attributes_to_select
     )
@@ -80,6 +85,10 @@ def main():
         file_name="analytics_base_table",
         file_type="parquet",
         write_method="write_parquet",
+    )
+    write_data_profile_report(
+        flat_structure=consumable_flat_structure,
+        json_file_name="analytics_base_table"
     )
 
     print(f"FANTASTIC JOB {settings.sample_setting}")
