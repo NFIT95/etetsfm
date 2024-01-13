@@ -7,8 +7,9 @@ from data_pipeline.checker import (
     create_gx_filesystem_context,
     validate_curated_flat_structure,
 )
-from data_pipeline.curator import create_curated_flat_structure
 from data_pipeline.extractor import extract_json_lines_from_json_file
+from data_pipeline.curator import create_curated_flat_structure
+from data_pipeline.transformer import create_consumable_flat_structure
 from data_pipeline.params import (
     attributes_to_select,
     curated_flat_structures,
@@ -16,7 +17,6 @@ from data_pipeline.params import (
     attributes_to_select
 )
 from data_pipeline.reader import read_data_from_file
-from data_pipeline.transformer import create_consumable_flat_structure
 from data_pipeline.writer import write_data_to_file
 from data_pipeline.profiler import write_data_profile_report
 
