@@ -17,6 +17,9 @@ check:
 	poetry run isort -c .
 	poetry run pylint --recursive=y .
 
+validate-lock:
+	poetry lock --check
+
 lock:
 	poetry lock --no-update
 

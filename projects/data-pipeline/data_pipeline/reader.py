@@ -22,15 +22,12 @@ def _create_path_for_reader(folder_name: str, file_name: str, file_type: str) ->
     dir_path = f"{DATA_ROOT_FOLDER}/{folder_name}"
     input_files_path = os.listdir(dir_path)
     file_end = f"{file_name}.{file_type}"
-    
+
     return dir_path, input_files_path, file_end
 
 
-
-
-
 def read_data_from_file(
-    folder_name: str, file_name: str, file_type:str, read_method: str
+    folder_name: str, file_name: str, file_type: str, read_method: str
 ) -> pl.DataFrame:
     """
     Read data from the latest input file of the input type in a polars Dataframe.
@@ -60,5 +57,5 @@ def read_data_from_file(
     sorted_files = sorted(files_to_sort, reverse=True, key=lambda x: x.split("_")[0])
     input_file_path = f"{dir_path}/{sorted_files[0]}"
     flat_structure = getattr(pl, read_method)(input_file_path)
-    
+
     return flat_structure
