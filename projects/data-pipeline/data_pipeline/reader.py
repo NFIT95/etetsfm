@@ -37,7 +37,6 @@ def read_data_from_file(
     # Pick file with the latest timestamp from files_to_sort
     sorted_files = sorted(files_to_sort, reverse=True, key=lambda x: x.split("_")[0])
     input_file_path = f"{dir_path}/{sorted_files[0]}"
-    
     flat_structure = getattr(pl, read_method)(input_file_path)
     
     return flat_structure
