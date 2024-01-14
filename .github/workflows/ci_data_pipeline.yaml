@@ -32,21 +32,17 @@ jobs:
           echo "Poetry version is $(poetry --version)" 
 
       - name: Validate the dependencies and lock file
-        needs: Setup environment
         working-directory: ./projects/data-pipeline
         run: poetry lock --check
 
       - name: API - Install python dependencies
-        needs: Validate the dependencies and lock file
         working-directory: ./projects/data-pipeline
         run: make install-deps
 
       - name: API - Check formatting
-        needs: API - Install python dependencies
         working-directory: ./projects/data-pipeline
         run: make check
 
       - name: API - Run tests
-        needs: API - Install python dependencies
         working-directory: ./projects/data-pipeline
         run: make test
