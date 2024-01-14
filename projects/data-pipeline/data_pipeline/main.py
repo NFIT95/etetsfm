@@ -29,7 +29,7 @@ def main():
     create_gx_expectations_suites(context, settings.expectation_suites_names)
     create_gx_datasources(context, settings.data_source_names)
 
-    # ETL logic
+    # ETL logic - one file cached in memory at a time
     for json_file_name in settings.json_files_names:
         extracted_json_lines = extract_json_lines_from_json_file(
             json_file_name=json_file_name
