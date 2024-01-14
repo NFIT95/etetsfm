@@ -19,6 +19,7 @@ polars = "^0.20.3"
 great-expectations = "^0.18.7"
 ruamel-yaml = "<0.18"
 pyarrow = "^14.0.2"
+ydata-profiling = "^4.6.4"
 
 
 [build-system]
