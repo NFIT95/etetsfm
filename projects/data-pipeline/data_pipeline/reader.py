@@ -7,6 +7,28 @@ import polars as pl
 from data_pipeline.params import DATA_ROOT_FOLDER
 
 
+def _create_path_for_reader(folder_name: str, file_name: str, file_type: str) -> str:
+    """
+    Create a path for a file to be read
+
+    Args:
+        folder_name (str): name of the folder where the file will be written
+        file_name (str): name of the file that will be written
+        file_type (str): type of file that will be written, either csv or parquet
+
+    Returns:
+        path (str): path of the file to be read
+    """
+    dir_path = f"{DATA_ROOT_FOLDER}/{folder_name}"
+    input_files_path = os.listdir(dir_path)
+    file_end = f"{file_name}.{file_type}"
+    
+    return dir_path, input_files_path, file_end
+
+
+
+
+
 def read_data_from_file(
     folder_name: str, file_name: str, file_type:str, read_method: str
 ) -> pl.DataFrame:
