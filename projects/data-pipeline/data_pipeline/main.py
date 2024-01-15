@@ -6,6 +6,7 @@ from data_pipeline.checker import (
     create_gx_expectations_suites,
     create_gx_filesystem_context,
     validate_curated_flat_structure,
+    validate_consumable_flat_structure
 )
 from data_pipeline.curator import create_curated_flat_structure
 from data_pipeline.extractor import extract_json_lines_from_json_file
@@ -30,7 +31,7 @@ def main():
     context = create_gx_filesystem_context()
     create_gx_expectations_suites(context, expectation_suites_names)
     create_gx_datasources(context, data_source_names)
-
+    
     # ETL logic - one file cached in memory at a time
     for json_file_name in settings.json_files_names:
         extracted_json_lines = extract_json_lines_from_json_file(
@@ -55,8 +56,8 @@ def main():
             flat_structure=curated_flat_structure,
             context=context,
             json_file_name=json_file_name,
-            expectation_suite_name=expectation_suites_names[0],
-            data_source_name=data_source_names[0],
+            expectation_suite_name=expectation_suites_names["curated"],
+            data_source_name=data_source_names["curated"],
         )
         write_data_to_file(
             flat_structure=curated_flat_structure,
@@ -68,7 +69,7 @@ def main():
         write_data_profile_report(
             flat_structure=curated_flat_structure, file_name=json_file_name
         )
-
+    
     for json_file_name in settings.json_files_names:
         curated_flat_structures[json_file_name] = read_data_from_file(
             folder_name="curated_data",
@@ -79,6 +80,13 @@ def main():
 
     consumable_flat_structure = create_consumable_flat_structure(
         curated_flat_structures, columns_to_select, currencies_to_select
+    )
+    validate_consumable_flat_structure(
+        flat_structure=consumable_flat_structure,
+        context=context,
+        file_name="analytics_base_table",
+        expectation_suite_name=expectation_suites_names["consumable"],
+        data_source_name=data_source_names["consumable"],
     )
     write_data_to_file(
         flat_structure=consumable_flat_structure,
