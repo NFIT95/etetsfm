@@ -7,16 +7,17 @@ from pydantic import BaseModel, Field
 
 DATA_ROOT_FOLDER = "data"
 
-expectation_suites_names = [
-    "curated_flat_structure_suite",
-    "clean_flat_structure_suite",
-]
+expectation_suites_names = {
+    "curated":"curated_flat_structure_suite",
+    "consumable": "consumable_flat_structure_suite",
+}
 
 
-data_source_names = [
-    "curated",
-    "clean",
-]
+data_source_names = {
+    "curated":"curated",
+    "consumable":"consumable"
+}
+
 
 curated_flat_structures = {
     "sales": None,
@@ -38,8 +39,8 @@ columns_to_select = [
     "CustomerCity",
     "CustomerCountry",
     "CustomerEmail",
-    "CountryCurrency",
     "CountryName",
+    "CountryCurrency",
     "CountryRegion",
     "OrderDate",
     "CustomerActive",
@@ -256,5 +257,57 @@ class CountriesExpectationsStorage:
     )
     lengths_checks: List[int] = field(default_factory=lambda: [2, 3])
 
+
+@dataclass
+class AnalyticsBaseTableExpectationsStorage:
+    """Storage for countries data expectations"""
+
+    columns_to_exist_and_be_not_null: List[str] = field(
+        default_factory=lambda: [
+            "SaleId",
+            "SaleOrderId",
+            "SaleProductId",
+            "ProductName",
+            "ProductManufacturedCountry",
+            "CustomerName",
+            "CustomerAddress",
+            "CustomerCity",
+            "CustomerCountry",
+            "CustomerEmail",
+            "CountryCurrency",
+            "CountryName",
+            "CountryRegion",
+            "OrderDate",
+            "CustomerActive",
+            "CountryPopulation",
+            "CountryAreaSqMi",
+            "CountryPopDensityPerSqMi",
+            "CountryCoastlineCoastPerAreaRatio",
+            "CountryNetMigration",
+            "CountryInfantMortalityPer1000Births",
+            "CountryGDPPerCapita",
+            "CountryLiteracy",
+            "CountryPhonesPer1000",
+            "CountryArable",
+            "CountryCrops",
+            "CountryClimate",
+            "CountryBirthrate",
+            "CountryDeathrate",
+            "CountryAgriculture",
+            "CountryIndustry",
+            "CountryService",
+            "ProductWeightGrams",
+            "SaleQuantity",
+            "ProductWeightGramsPerSaleQuantity",
+            "CountryQuantityOverTotalQuantityPercentage",
+            "QuantityOverMainCountriesQuantityPercentage",
+            "QuantityOverTotalCountryQuantityPercentage",
+        ]
+    )
+    columns_to_be_unique: List[str] = field(default_factory=lambda: ["SaleId"])
+    columns_with_length_equal_to: List[str] = field(
+        default_factory=lambda: ["CountryCurrency", "ProductManufacturedCountry"]
+    )
+    lengths_checks: List[int] = field(default_factory=lambda: [3, 2])
 
 currencies_to_select = ["USD", "GBP", "EUR"]
