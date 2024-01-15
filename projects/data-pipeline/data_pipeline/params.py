@@ -8,15 +8,12 @@ from pydantic import BaseModel, Field
 DATA_ROOT_FOLDER = "data"
 
 expectation_suites_names = {
-    "curated":"curated_flat_structure_suite",
+    "curated": "curated_flat_structure_suite",
     "consumable": "consumable_flat_structure_suite",
 }
 
 
-data_source_names = {
-    "curated":"curated",
-    "consumable":"consumable"
-}
+data_source_names = {"curated": "curated", "consumable": "consumable"}
 
 
 curated_flat_structures = {
@@ -309,5 +306,6 @@ class AnalyticsBaseTableExpectationsStorage:
         default_factory=lambda: ["CountryCurrency", "ProductManufacturedCountry"]
     )
     lengths_checks: List[int] = field(default_factory=lambda: [3, 2])
+
 
 currencies_to_select = ["USD", "GBP", "EUR"]

@@ -33,7 +33,7 @@ jobs:
         working-directory: ./projects/data-pipeline
         run: make install-deps
 
-      - name: API - Check formatting
+      - name: API - Check linting
         working-directory: ./projects/data-pipeline
         run: make check
 

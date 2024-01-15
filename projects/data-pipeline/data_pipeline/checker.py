@@ -9,13 +9,13 @@ from great_expectations.data_context import FileDataContext
 from pydantic import ValidationError
 
 from data_pipeline.params import (
+    AnalyticsBaseTableExpectationsStorage,
     CountriesExpectationsStorage,
     CustomersExpectationsStorage,
     JsonLinesStorage,
     OrdersExpectationsStorage,
     ProductsExpectationsStorage,
     SalesExpectationsStorage,
-    AnalyticsBaseTableExpectationsStorage
 )
 
 GX_DATA_CONTEXT_FOLDER = "tools/gx/data_context"
@@ -302,16 +302,16 @@ def _validate_gx_analytics_base_table_clean_expectations(
     for column in expectations_storage.columns_to_exist_and_be_not_null:
         validator.expect_column_to_exist(column)
         validator.expect_column_values_to_not_be_null(column)
-    
+
     for column in expectations_storage.columns_to_be_unique:
         validator.expect_column_values_to_be_unique(column)
-    
+
     for column, length in zip(
         expectations_storage.columns_with_length_equal_to,
         expectations_storage.lengths_checks,
     ):
         validator.expect_column_value_lengths_to_equal(column, length)
-        
+
     validator_results = validator.validate()["success"]
 
     return validator_results
@@ -401,17 +401,17 @@ def validate_consumable_flat_structure(
 
     # Convert pl Dataframe to pd Dataframe for gx integration
     flat_structure = flat_structure.to_pandas()
-    
+
     batch_request = _create_gx_batch_request(
         context.get_datasource(data_source_name), file_name, flat_structure
     )
 
     validator = _create_gx_validator(context, batch_request, expectation_suite_name)
-    
+
     validation_results = _validate_gx_analytics_base_table_clean_expectations(
         validator, AnalyticsBaseTableExpectationsStorage()
     )
-    
+
     if not validation_results:
         print(
             f"""Validation unsuccessful. {file_name} curated data

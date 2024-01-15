@@ -5,8 +5,8 @@ from data_pipeline.checker import (
     create_gx_datasources,
     create_gx_expectations_suites,
     create_gx_filesystem_context,
+    validate_consumable_flat_structure,
     validate_curated_flat_structure,
-    validate_consumable_flat_structure
 )
 from data_pipeline.curator import create_curated_flat_structure
 from data_pipeline.extractor import extract_json_lines_from_json_file
@@ -31,7 +31,7 @@ def main():
     context = create_gx_filesystem_context()
     create_gx_expectations_suites(context, expectation_suites_names)
     create_gx_datasources(context, data_source_names)
-    
+
     # ETL logic - one file cached in memory at a time
     for json_file_name in settings.json_files_names:
         extracted_json_lines = extract_json_lines_from_json_file(
@@ -69,7 +69,7 @@ def main():
         write_data_profile_report(
             flat_structure=curated_flat_structure, file_name=json_file_name
         )
-    
+
     for json_file_name in settings.json_files_names:
         curated_flat_structures[json_file_name] = read_data_from_file(
             folder_name="curated_data",
