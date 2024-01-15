@@ -11,6 +11,8 @@ on:
     paths:
       - "projects/data-pipeline/**"
 
+  workflow_dispatch:
+
 jobs:
   data-pipeline-ci:
     runs-on: ubuntu-latest
