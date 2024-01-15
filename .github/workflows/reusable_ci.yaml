@@ -3,9 +3,6 @@ run-name: ${{ github.actor }} pushed to ${{ github.ref }}
 
 on:
   workflow_call:
-    workflows:
-      - workflow_name:
-          version: 1
 
 jobs:
   reusable_ci:
