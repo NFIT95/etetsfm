@@ -15,6 +15,7 @@ from data_pipeline.params import (
     OrdersExpectationsStorage,
     ProductsExpectationsStorage,
     SalesExpectationsStorage,
+    AnalyticsBaseTableExpectationsStorage
 )
 
 GX_DATA_CONTEXT_FOLDER = "tools/gx/data_context"
@@ -80,7 +81,8 @@ def create_gx_expectations_suites(
         context (gx.DataContext): great_expectations FileSystem DataContext
         expectation_suites_names (str): list of expectation suite names to create
     """
-    for expectation_suite_name in expectation_suites_names:
+
+    for expectation_suite_name in expectation_suites_names.values():
         context.add_or_update_expectation_suite(expectation_suite_name)
 
 
@@ -291,8 +293,32 @@ def _validate_gx_countries_curated_expectations(
     return validator_results
 
 
+def _validate_gx_analytics_base_table_clean_expectations(
+    validator: gx, expectations_storage: AnalyticsBaseTableExpectationsStorage
+) -> gx:
+    """PyDocs"""
+    expectations_storage = AnalyticsBaseTableExpectationsStorage()
+
+    for column in expectations_storage.columns_to_exist_and_be_not_null:
+        validator.expect_column_to_exist(column)
+        validator.expect_column_values_to_not_be_null(column)
+    
+    for column in expectations_storage.columns_to_be_unique:
+        validator.expect_column_values_to_be_unique(column)
+    
+    for column, length in zip(
+        expectations_storage.columns_with_length_equal_to,
+        expectations_storage.lengths_checks,
+    ):
+        validator.expect_column_value_lengths_to_equal(column, length)
+        
+    validator_results = validator.validate()["success"]
+
+    return validator_results
+
+
 def validate_curated_flat_structure(
-    flat_structure: pd.DataFrame,
+    flat_structure: pl.DataFrame,
     context: gx.DataContext,
     json_file_name: str,
     expectation_suite_name: str,
@@ -300,10 +326,10 @@ def validate_curated_flat_structure(
 ) -> None:
     """
     Validates input expectation suite expectations against curated version of
-    an input JSON file returning full validation results
+    an input JSON file
 
     Args:
-        flat_structure (pd.DataFrame): input Pandas dataframe with curated data
+        flat_structure (pl.DataFrame): input Polars dataframe with curated data
         context (gx.DataContext): great_expectations FileSystem DataContext
         json_file_name (str): input JSON file name
         expectation_suite_name (str): input expectation suite name
@@ -349,7 +375,46 @@ def validate_curated_flat_structure(
 
     if not validation_results:
         print(
-            f"""Validation unsuccessful. Curated data related to {json_file_name}
+            f"""Validation unsuccessful. {json_file_name} curated data
+            does not match expectations. Stopping execution now."""
+        )
+        sys.exit()
+
+
+def validate_consumable_flat_structure(
+    flat_structure: pl.DataFrame,
+    context: gx.DataContext,
+    file_name: str,
+    expectation_suite_name: str,
+    data_source_name: str,
+) -> None:
+    """
+    Validates input expectation suite expectations against analytics base table
+
+    Args:
+        flat_structure (pl.DataFrame): input Polars dataframe with consumable data
+        context (gx.DataContext): great_expectations FileSystem DataContext
+        json_file_name (str): consumable file name
+        expectation_suite_name (str): input expectation suite name
+        data_source_name (str): input data source name
+    """
+
+    # Convert pl Dataframe to pd Dataframe for gx integration
+    flat_structure = flat_structure.to_pandas()
+    
+    batch_request = _create_gx_batch_request(
+        context.get_datasource(data_source_name), file_name, flat_structure
+    )
+
+    validator = _create_gx_validator(context, batch_request, expectation_suite_name)
+    
+    validation_results = _validate_gx_analytics_base_table_clean_expectations(
+        validator, AnalyticsBaseTableExpectationsStorage()
+    )
+    
+    if not validation_results:
+        print(
+            f"""Validation unsuccessful. {file_name} curated data
             does not match expectations. Stopping execution now."""
         )
         sys.exit()
