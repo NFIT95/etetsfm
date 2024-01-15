@@ -10,6 +10,7 @@ from data_pipeline.checker import (
 from data_pipeline.curator import create_curated_flat_structure
 from data_pipeline.extractor import extract_json_lines_from_json_file
 from data_pipeline.params import (
+    expectation_suites_names,
     attributes_to_select,
     curated_flat_structures,
     json_files_validators,
@@ -25,7 +26,7 @@ def main():
 
     # Initiate gx objects
     context = create_gx_filesystem_context()
-    create_gx_expectations_suites(context, settings.expectation_suites_names)
+    create_gx_expectations_suites(context, expectation_suites_names)
     create_gx_datasources(context, settings.data_source_names)
 
     # ETL logic - one file cached in memory at a time

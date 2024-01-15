@@ -14,10 +14,6 @@ class Settings(BaseSettings):
         "orders",
         "countries",
     ]
-    expectation_suites_names: list[str] = [
-        "curated_flat_structure_suite",
-        "clean_flat_structure_suite",
-    ]
     data_source_names: list[str] = ["curated", "clean"]
 
     class Config:
