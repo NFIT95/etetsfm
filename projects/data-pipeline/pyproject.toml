@@ -21,6 +21,15 @@ ruamel-yaml = "<0.18"
 pyarrow = "^14.0.2"
 ydata-profiling = "^4.6.4"
 
+# Formatting
+[tool.isort]
+profile = "black"
+
+[tool.pydocstyle]
+convention = "google"
+
+[tool.pylint]
+ignore = [".venv", "tests"]
 
 [build-system]
 requires = ["poetry-core"]
