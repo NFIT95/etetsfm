@@ -1,9 +1,10 @@
 """Writer module to write data to physical files"""
 
 from datetime import datetime
-from data_pipeline.params import DATA_ROOT_FOLDER
 
 import polars as pl
+
+from data_pipeline.params import DATA_ROOT_FOLDER
 
 
 def write_data_to_file(
