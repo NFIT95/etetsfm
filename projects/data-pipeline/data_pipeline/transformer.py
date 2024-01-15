@@ -54,41 +54,90 @@ def _join_curated_flat_structures(
     Returns:
         joined_flat_structure (pl.DataFrame): joined flat structure
     """
-    join_method = "left"
-
     joined_flat_structure = (
         curated_flat_structures["sales"]
         .join(
             other=curated_flat_structures["products"],
             left_on="SaleProductId",
             right_on="ProductProductId",
-            how=join_method,
+            how="left",
         )
         .join(
             other=curated_flat_structures["orders"],
             left_on="SaleOrderId",
             right_on="OrderOrderId",
-            how=join_method,
+            how="left",
         )
         .join(
             other=curated_flat_structures["customers"],
             left_on="OrderCustomerId",
             right_on="CustomerCustomerId",
-            how=join_method,
+            how="left",
         )
         .join(
             other=curated_flat_structures["countries"],
             left_on="CustomerCountry",
             right_on="CountryCountry",
-            how=join_method,
+            how="left",
         )
     )
 
     return joined_flat_structure
 
 
-def _add_feature_country_percentage_of_total_quantity(
+def _create_total_quantities_per_country_and_currency(
+    filtered_flat_structure: pl.DataFrame,
+) -> pl.DataFrame:
+    """
+    Create total quantities per country and currency starting from a filtered flat structure
+
+    Args:
+        filtered_flat_structure (pl.DataFrame): filtered flat structure
+
+    Returns:
+        total_quantity_per_country_and_currency (pl.DataFrame): total quantities per country
+        and currency
+    """
+    total_quantity_per_country_and_currency = filtered_flat_structure.group_by(
+        ["CountryName", "CountryCurrency"]
+    ).agg(
+        pl.col("SaleQuantity")
+        .alias("TotalSaleQuantityPerCountry")
+        .sum()
+        .cast(pl.Decimal(scale=6, precision=None))
+    )
+
+    return total_quantity_per_country_and_currency
+
+
+def _add_feature_country_quantity_over_total_quantity_percentage(
     joined_flat_structure: pl.DataFrame,
+    total_quantity_per_country_and_currency: pl.DataFrame,
+) -> pl.DataFrame:
+    """PyDocs"""
+
+    total_quantity = joined_flat_structure.select(pl.sum("SaleQuantity")).item()
+    total_quantity_per_country = total_quantity_per_country_and_currency.select(
+        "CountryName", "TotalSaleQuantityPerCountry"
+    )
+
+    joined_flat_structure = joined_flat_structure.join(
+        other=total_quantity_per_country,
+        left_on="CountryName",
+        right_on="CountryName",
+        how="left",
+    ).with_columns(
+        (pl.col("TotalSaleQuantityPerCountry") / pl.lit(total_quantity))
+        .cast(pl.Decimal(scale=6, precision=None))
+        .alias("CountryQuantityOverTotalQuantityPercentage")
+    )
+
+    return joined_flat_structure
+
+
+def _add_feature_quantity_over_total_country_quantity_percentage(
+    joined_flat_structure: pl.DataFrame,
+    total_quantity_per_country_and_currency: pl.DataFrame,
 ) -> pl.DataFrame:
     """
     Add feature country percentage of total quantity to joined_flat_structure
@@ -96,31 +145,47 @@ def _add_feature_country_percentage_of_total_quantity(
     Args:
         joined_flat_structure (pl.DataFrame): joined flat structure without
         country percentage of total quantity feature
+        total_quantity_per_country (pl.DataFrame): total quantity per country
 
     Returns:
         joined_flat_structure (pl.DataFrame): joined flat structure with
         country percentage of total quantity feature
     """
-    grouping_column, numerator, denominator = (
-        "CountryName",
-        "SaleQuantity",
-        "TotalSaleQuantityPerCountry",
+
+    joined_flat_structure = joined_flat_structure.join(
+        other=total_quantity_per_country_and_currency,
+        left_on="CountryName",
+        right_on="CountryName",
+        how="left",
+    ).with_columns(
+        (pl.col("SaleQuantity") / pl.col("TotalSaleQuantityPerCountry"))
+        .cast(pl.Decimal(scale=6, precision=None))
+        .alias("QuantityOverTotalCountryQuantityPercentage")
     )
 
-    joined_flat_structure = (
-        joined_flat_structure.group_by(grouping_column)
-        .agg(pl.col(numerator).alias(denominator).sum())
-        .join(
-            other=joined_flat_structure,
-            left_on=grouping_column,
-            right_on=grouping_column,
-            how="left",
+    return joined_flat_structure
+
+
+def _add_feature_quantity_over_main_countries_quantity_percentage(
+    joined_flat_structure: pl.DataFrame,
+    total_quantity_per_country_and_currency: pl.DataFrame,
+    currencies_to_select: list[str],
+):
+    """PyDocs"""
+
+    total_main_countries_quantity = (
+        total_quantity_per_country_and_currency.filter(
+            pl.col("CountryCurrency").is_in(currencies_to_select)
         )
-        .with_columns(
-            (pl.col(numerator) / pl.col(denominator))
-            .cast(pl.Float64)
-            .alias("CountryPercentageOfTotalQuantity")
-        )
+    ).select(pl.sum("TotalSaleQuantityPerCountry").alias("TotalSaleQuantity"))
+
+    joined_flat_structure = joined_flat_structure.join(
+        other=total_main_countries_quantity,
+        how="cross",
+    ).with_columns(
+        (pl.col("SaleQuantity") / pl.col("TotalSaleQuantity"))
+        .cast(pl.Decimal(scale=6, precision=None))
+        .alias("QuantityOverMainCountriesQuantityPercentage")
     )
 
     return joined_flat_structure
@@ -142,7 +207,7 @@ def _add_feature_product_weight_grams_per_sale_quantity(
     """
     joined_flat_structure = joined_flat_structure.with_columns(
         (pl.col("ProductWeightGrams") / pl.col("SaleQuantity"))
-        .cast(pl.Float64)
+        .cast(pl.Decimal(scale=6, precision=None))
         .alias("ProductWeightGramsPerSaleQuantity")
     )
 
@@ -150,7 +215,9 @@ def _add_feature_product_weight_grams_per_sale_quantity(
 
 
 def create_consumable_flat_structure(
-    curated_flat_structures: dict, attributes_to_select: list[str]
+    curated_flat_structures: dict,
+    columns_to_select: list[str],
+    currencies_to_select: list[str],
 ) -> pl.DataFrame:
     """
     Create consumable flat structure with all features
@@ -182,19 +249,36 @@ def create_consumable_flat_structure(
         {"SaleSaleId": "SaleId"}
     )
 
-    # Join flat structures
+    # Join
     joined_flat_structure = _join_curated_flat_structures(curated_flat_structures)
 
     # Add features
+    total_quantity_per_country_and_currency = (
+        _create_total_quantities_per_country_and_currency(joined_flat_structure)
+    )
     add_feature_functions = [
-        _add_feature_country_percentage_of_total_quantity,
-        _add_feature_product_weight_grams_per_sale_quantity,
+        _add_feature_country_quantity_over_total_quantity_percentage,
+        _add_feature_quantity_over_total_country_quantity_percentage,
     ]
 
     for add_feature_function in add_feature_functions:
-        joined_flat_structure = add_feature_function(joined_flat_structure)
+        joined_flat_structure = add_feature_function(
+            joined_flat_structure, total_quantity_per_country_and_currency
+        )
 
-    # Select columns
-    consumable_flat_structure = joined_flat_structure.select(attributes_to_select)
+    joined_flat_structure = (
+        _add_feature_quantity_over_main_countries_quantity_percentage(
+            joined_flat_structure,
+            total_quantity_per_country_and_currency,
+            currencies_to_select,
+        )
+    )
+
+    joined_flat_structure = _add_feature_product_weight_grams_per_sale_quantity(
+        joined_flat_structure
+    )
+
+    # Select attributes
+    consumable_flat_structure = joined_flat_structure.select(columns_to_select)
 
     return consumable_flat_structure

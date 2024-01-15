@@ -14,7 +14,6 @@ class Settings(BaseSettings):
         "orders",
         "countries",
     ]
-    data_source_names: list[str] = ["curated", "clean"]
 
     class Config:
         """Loads the env vars from a .env file"""

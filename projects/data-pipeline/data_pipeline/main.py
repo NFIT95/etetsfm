@@ -10,8 +10,10 @@ from data_pipeline.checker import (
 from data_pipeline.curator import create_curated_flat_structure
 from data_pipeline.extractor import extract_json_lines_from_json_file
 from data_pipeline.params import (
-    attributes_to_select,
+    columns_to_select,
     curated_flat_structures,
+    currencies_to_select,
+    data_source_names,
     expectation_suites_names,
     json_files_validators,
 )
@@ -27,7 +29,7 @@ def main():
     # Initiate gx objects
     context = create_gx_filesystem_context()
     create_gx_expectations_suites(context, expectation_suites_names)
-    create_gx_datasources(context, settings.data_source_names)
+    create_gx_datasources(context, data_source_names)
 
     # ETL logic - one file cached in memory at a time
     for json_file_name in settings.json_files_names:
@@ -53,8 +55,8 @@ def main():
             flat_structure=curated_flat_structure,
             context=context,
             json_file_name=json_file_name,
-            expectation_suite_name=settings.expectation_suites_names[0],
-            data_source_name=settings.data_source_names[0],
+            expectation_suite_name=expectation_suites_names[0],
+            data_source_name=data_source_names[0],
         )
         write_data_to_file(
             flat_structure=curated_flat_structure,
@@ -76,7 +78,7 @@ def main():
         )
 
     consumable_flat_structure = create_consumable_flat_structure(
-        curated_flat_structures, attributes_to_select
+        curated_flat_structures, columns_to_select, currencies_to_select
     )
     write_data_to_file(
         flat_structure=consumable_flat_structure,

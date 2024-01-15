@@ -13,6 +13,11 @@ expectation_suites_names = [
 ]
 
 
+data_source_names = [
+    "curated",
+    "clean",
+]
+
 curated_flat_structures = {
     "sales": None,
     "products": None,
@@ -22,7 +27,7 @@ curated_flat_structures = {
 }
 
 
-attributes_to_select = [
+columns_to_select = [
     "SaleId",
     "SaleOrderId",
     "SaleProductId",
@@ -57,8 +62,10 @@ attributes_to_select = [
     "CountryService",
     "ProductWeightGrams",
     "SaleQuantity",
-    "CountryPercentageOfTotalQuantity",
     "ProductWeightGramsPerSaleQuantity",
+    "CountryQuantityOverTotalQuantityPercentage",
+    "QuantityOverMainCountriesQuantityPercentage",
+    "QuantityOverTotalCountryQuantityPercentage",
 ]
 
 
@@ -248,3 +255,6 @@ class CountriesExpectationsStorage:
         default_factory=lambda: ["Country", "Currency"]
     )
     lengths_checks: List[int] = field(default_factory=lambda: [2, 3])
+
+
+currencies_to_select = ["USD", "GBP", "EUR"]
