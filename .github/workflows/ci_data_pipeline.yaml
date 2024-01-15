@@ -15,4 +15,4 @@ on:
 
 jobs:
   call-workflow:
-    uses: .github/workflows/reusable_ci.yaml
+    uses: .github/workflows/reusable_ci.yaml@v1
