@@ -12,7 +12,7 @@ from data_pipeline.params import DATA_ROOT_FOLDER
 def write_data_profile_report(flat_structure: pl.DataFrame, file_name: str) -> None:
     """
     Creates html data profiling report for an input polars dataframe
-    
+
     Args:
         flat_structure (pl.DataFrame): input polars dataframe
         json_file_name (str): input json file name
