@@ -10,9 +10,9 @@ from data_pipeline.checker import (
 from data_pipeline.curator import create_curated_flat_structure
 from data_pipeline.extractor import extract_json_lines_from_json_file
 from data_pipeline.params import (
-    expectation_suites_names,
     attributes_to_select,
     curated_flat_structures,
+    expectation_suites_names,
     json_files_validators,
 )
 from data_pipeline.profiler import write_data_profile_report

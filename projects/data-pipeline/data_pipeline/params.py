@@ -7,9 +7,10 @@ from pydantic import BaseModel, Field
 
 DATA_ROOT_FOLDER = "data"
 
-expectation_suites_names = ["curated_flat_structure_suite", "clean_flat_structure_suite"]
-
-
+expectation_suites_names = [
+    "curated_flat_structure_suite",
+    "clean_flat_structure_suite",
+]
 
 
 curated_flat_structures = {
