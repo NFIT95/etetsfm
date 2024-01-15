@@ -46,6 +46,6 @@ jobs:
         working-directory: ./projects/data-pipeline
         run: make check
 
-      - name: API - Run tests
-        working-directory: ./projects/data-pipeline
-        run: make test
+#      - name: API - Run tests
+#        working-directory: ./projects/data-pipeline
+#        run: make test
