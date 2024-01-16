@@ -2,6 +2,7 @@
 
 ## Latest Update
 - Unit tests missing to complete data-pipeline app
+- Incorporate Kedro
 
 ### Overview
 
