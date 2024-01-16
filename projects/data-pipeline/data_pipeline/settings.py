@@ -7,13 +7,6 @@ class Settings(BaseSettings):
     """Base settings object"""
 
     sample_setting: str = "Nicola Filosi"
-    json_files_names: list[str] = [
-        "sales",
-        "customers",
-        "products",
-        "orders",
-        "countries",
-    ]
 
     class Config:
         """Loads the env vars from a .env file"""

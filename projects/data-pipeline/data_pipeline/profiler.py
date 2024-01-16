@@ -15,7 +15,7 @@ def write_data_profile_report(flat_structure: pl.DataFrame, file_name: str) -> N
 
     Args:
         flat_structure (pl.DataFrame): input polars dataframe
-        json_file_name (str): input json file name
+        file_name (str): output file name
     """
 
     # Convert from polars to pandas dataframe for ydata-profiling integration

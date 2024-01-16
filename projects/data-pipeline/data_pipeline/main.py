@@ -1,5 +1,4 @@
 """Main entry point for data pipeline"""
-from data_pipeline import settings
 from data_pipeline.checker import (
     check_json_lines,
     create_gx_datasources,
@@ -11,7 +10,8 @@ from data_pipeline.checker import (
 from data_pipeline.curator import create_curated_flat_structure
 from data_pipeline.extractor import extract_json_lines_from_json_file
 from data_pipeline.params import (
-    columns_to_select,
+    json_files_names,
+    consumable_columns_to_select,
     curated_flat_structures,
     currencies_to_select,
     data_source_names,
@@ -33,7 +33,7 @@ def main():
     create_gx_datasources(context, data_source_names)
 
     # ETL logic - one file cached in memory at a time
-    for json_file_name in settings.json_files_names:
+    for json_file_name in json_files_names:
         extracted_json_lines = extract_json_lines_from_json_file(
             json_file_name=json_file_name
         )
@@ -70,7 +70,7 @@ def main():
             flat_structure=curated_flat_structure, file_name=json_file_name
         )
 
-    for json_file_name in settings.json_files_names:
+    for json_file_name in json_files_names:
         curated_flat_structures[json_file_name] = read_data_from_file(
             folder_name="curated_data",
             file_name=json_file_name,
@@ -79,7 +79,7 @@ def main():
         )
 
     consumable_flat_structure = create_consumable_flat_structure(
-        curated_flat_structures, columns_to_select, currencies_to_select
+        curated_flat_structures, consumable_columns_to_select, currencies_to_select
     )
     validate_consumable_flat_structure(
         flat_structure=consumable_flat_structure,

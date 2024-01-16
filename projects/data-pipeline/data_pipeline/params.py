@@ -7,6 +7,14 @@ from pydantic import BaseModel, Field
 
 DATA_ROOT_FOLDER = "data"
 
+json_files_names = [
+    "sales",
+    "customers",
+    "products",
+    "orders",
+    "countries",
+]
+
 expectation_suites_names = {
     "curated": "curated_flat_structure_suite",
     "consumable": "consumable_flat_structure_suite",
@@ -25,7 +33,7 @@ curated_flat_structures = {
 }
 
 
-columns_to_select = [
+consumable_columns_to_select = [
     "SaleId",
     "SaleOrderId",
     "SaleProductId",

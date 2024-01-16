@@ -1,4 +1,4 @@
-"""Transformer module to create final master table"""
+"""Transformer module to create consumable analytics base table"""
 
 import polars as pl
 
@@ -22,15 +22,15 @@ def _create_column_prefix(json_file_name: str) -> str:
 
 
 def _create_columns_renaming(
-    column_prefix: str, curated_flat_structure: dict, columns_renaming: dict
+    column_prefix: str, curated_flat_structure: pl.DataFrame, columns_renaming: dict
 ) -> dict:
     """
     Create a mapping between old columns names and new columns names
 
     Args:
         column_prefix (str): column prefix
-        curated_flat_structure (dict): curated flat structure
-        columns_renaming (dict): empty between old columns names and new columns names
+        curated_flat_structure (pl.DataFrame): curated flat structure
+        columns_renaming (dict): empty mapping between old columns names and new columns names
 
     Returns:
         columns_renaming (dict): updated mapping between old columns names and
@@ -89,7 +89,7 @@ def _create_total_quantities_per_country_and_currency(
     filtered_flat_structure: pl.DataFrame,
 ) -> pl.DataFrame:
     """
-    Create total quantities per country and currency starting from a filtered flat structure
+    Create total quantities per country and currency
 
     Args:
         filtered_flat_structure (pl.DataFrame): filtered flat structure
@@ -114,7 +114,19 @@ def _add_feature_country_quantity_over_total_quantity_percentage(
     joined_flat_structure: pl.DataFrame,
     total_quantity_per_country_and_currency: pl.DataFrame,
 ) -> pl.DataFrame:
-    """PyDocs"""
+    """
+    Add feature country quantity over total quantity percentage
+    
+    Args:
+        joined_flat_structure (pl.DataFrame): joined flat structure without
+        country quantity over total quantity percentage feature
+        total_quantity_per_country_and_currency (pl.DataFrame): total quantities per country
+        and currency
+        
+    Returns:
+        joined_flat_structure (pl.DataFrame): joined flat structure with
+        country quantity over total quantity percentage feature
+    """
 
     total_quantity = joined_flat_structure.select(pl.sum("SaleQuantity")).item()
     total_quantity_per_country = total_quantity_per_country_and_currency.select(
@@ -140,16 +152,17 @@ def _add_feature_quantity_over_total_country_quantity_percentage(
     total_quantity_per_country_and_currency: pl.DataFrame,
 ) -> pl.DataFrame:
     """
-    Add feature country percentage of total quantity to joined_flat_structure
+    Add feature quantity over total quantity percentage to joined_flat_structure
 
     Args:
         joined_flat_structure (pl.DataFrame): joined flat structure without
-        country percentage of total quantity feature
-        total_quantity_per_country (pl.DataFrame): total quantity per country
+        quantity over total quantity percentage feature
+        total_quantity_per_country_and_currency (pl.DataFrame): total quantities per country
+        and currency
 
     Returns:
         joined_flat_structure (pl.DataFrame): joined flat structure with
-        country percentage of total quantity feature
+        quantity over total quantity percentage feature
     """
 
     joined_flat_structure = joined_flat_structure.join(
@@ -171,7 +184,20 @@ def _add_feature_quantity_over_main_countries_quantity_percentage(
     total_quantity_per_country_and_currency: pl.DataFrame,
     currencies_to_select: list[str],
 ):
-    """PyDocs"""
+    """
+    Add feature quantity over main countries quantity percentage to joined_flat_structure
+
+    Args:
+        joined_flat_structure (pl.DataFrame): joined flat structure without
+        quantity over main countries quantity percentage feature
+        total_quantity_per_country_and_currency (pl.DataFrame): total quantities per country
+        and currency
+        currencies_to_select (list[str]): currencies to filter for
+
+    Returns:
+        joined_flat_structure (pl.DataFrame): joined flat structure with
+        quantity over main countries quantity percentage feature
+    """
 
     total_main_countries_quantity = (
         total_quantity_per_country_and_currency.filter(
@@ -216,7 +242,7 @@ def _add_feature_product_weight_grams_per_sale_quantity(
 
 def create_consumable_flat_structure(
     curated_flat_structures: dict,
-    columns_to_select: list[str],
+    consumable_columns_to_select: list[str],
     currencies_to_select: list[str],
 ) -> pl.DataFrame:
     """
@@ -225,6 +251,7 @@ def create_consumable_flat_structure(
     Args:
         curated_flat_structures (dict): curated flat structures
         attributes_to_select (list[str]): attributes to select from joined flat structure
+        currencies_to_select (list[str]): currencies to filter for
 
     Returns
         consumable_flat_structure (pl.DataFrame): consumable flat structure
@@ -279,6 +306,6 @@ def create_consumable_flat_structure(
     )
 
     # Select attributes
-    consumable_flat_structure = joined_flat_structure.select(columns_to_select)
+    consumable_flat_structure = joined_flat_structure.select(consumable_columns_to_select)
 
     return consumable_flat_structure
