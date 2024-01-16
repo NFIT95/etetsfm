@@ -299,11 +299,11 @@ def _validate_gx_analytics_base_table_clean_expectations(
     """
     Creates expectations for analytics base table consumable data against the input
     validator
-    
+
     Args:
         validator (gx): great_expectations validator
         expectations_storage (AnalyticsBaseTableExpectationsStorage): expectations storage
-    
+
     Returns:
         validator_result (gx): expectations validation result
     """
