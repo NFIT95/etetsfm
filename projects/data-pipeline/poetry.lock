@@ -3917,5 +3917,5 @@ unicode = ["tangled-up-in-unicode (==0.2.0)"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = "3.10.4"
-content-hash = "1f5e065dba9ebf755e04f5ac52b654447b55676933ee4d6112ab50f924bbe371"
+python-versions = "~3.10"
+content-hash = "81b075f526277f0b3ee9baab758d56c8428c797b1a61cbcd07c110c60d854987"
