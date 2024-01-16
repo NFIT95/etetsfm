@@ -99,8 +99,6 @@ def main():
         flat_structure=consumable_flat_structure, file_name="analytics_base_table"
     )
 
-    print(f"FANTASTIC JOB {settings.sample_setting}")
-
 
 if __name__ == "__main__":
     main()
