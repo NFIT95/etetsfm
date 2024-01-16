@@ -1625,6 +1625,17 @@ files = [
 ]
 
 [[package]]
+name = "logging"
+version = "0.4.9.6"
+description = "A logging module for Python"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "logging-0.4.9.6.tar.gz", hash = "sha256:26f6b50773f085042d301085bd1bf5d9f3735704db9f37c1ce6d8b85c38f2417"},
+]
+
+[[package]]
 name = "makefun"
 version = "1.15.2"
 description = "Small library to dynamically create python functions."
@@ -3918,4 +3929,4 @@ unicode = ["tangled-up-in-unicode (==0.2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.10"
-content-hash = "81b075f526277f0b3ee9baab758d56c8428c797b1a61cbcd07c110c60d854987"
+content-hash = "6dd097874686fa419f1e8314b74dd2c8153a9ae958d6eea6d2e9f407433a84ea"
