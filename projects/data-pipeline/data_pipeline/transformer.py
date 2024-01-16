@@ -116,13 +116,13 @@ def _add_feature_country_quantity_over_total_quantity_percentage(
 ) -> pl.DataFrame:
     """
     Add feature country quantity over total quantity percentage
-    
+
     Args:
         joined_flat_structure (pl.DataFrame): joined flat structure without
         country quantity over total quantity percentage feature
         total_quantity_per_country_and_currency (pl.DataFrame): total quantities per country
         and currency
-        
+
     Returns:
         joined_flat_structure (pl.DataFrame): joined flat structure with
         country quantity over total quantity percentage feature
@@ -306,6 +306,8 @@ def create_consumable_flat_structure(
     )
 
     # Select attributes
-    consumable_flat_structure = joined_flat_structure.select(consumable_columns_to_select)
+    consumable_flat_structure = joined_flat_structure.select(
+        consumable_columns_to_select
+    )
 
     return consumable_flat_structure
