@@ -146,14 +146,14 @@ def _validate_gx_sales_curated_expectations(
     validator: gx, expectations_storage: SalesExpectationsStorage
 ) -> gx:
     """
-    Creates expectations for sales data against the input validator
+    Creates expectations for sales curated data against the input validator
 
     Args:
         validator (gx): great_expectations validator
         expectations_storage (SalesExpectationsStorage): expectations storage
 
     Returns:
-        validator_results (gx): expectations validation results
+        validator_result (gx): expectations validation result
     """
     expectations_storage = SalesExpectationsStorage()
 
@@ -164,24 +164,24 @@ def _validate_gx_sales_curated_expectations(
     for column in expectations_storage.columns_to_be_unique:
         validator.expect_column_values_to_be_unique(column)
 
-    validator_results = validator.validate()["success"]
+    validator_result = validator.validate()["success"]
 
-    return validator_results
+    return validator_result
 
 
 def _validate_gx_products_curated_expectations(
     validator: gx, expectations_storage: ProductsExpectationsStorage
 ) -> gx:
     """
-    Creates expectations for products data against the input
+    Creates expectations for products curated data against the input
     validator
 
     Args:
         validator (gx): great_expectations validator
-        expectations_storage (SalesExpectationsStorage): expectations storage
+        expectations_storage (ProductsExpectationsStorage): expectations storage
 
     Returns:
-        validator_results (gx): expectations validation results
+        validator_result (gx): expectations validation result
     """
     expectations_storage = ProductsExpectationsStorage()
 
@@ -195,24 +195,24 @@ def _validate_gx_products_curated_expectations(
     for column in expectations_storage.columns_with_length_equal_to:
         validator.expect_column_value_lengths_to_equal(column, 2)
 
-    validation_results = validator.validate()["success"]
+    validation_result = validator.validate()["success"]
 
-    return validation_results
+    return validation_result
 
 
 def _validate_gx_orders_curated_expectations(
     validator: gx, expectations_storage: OrdersExpectationsStorage
 ) -> gx:
     """
-    Creates expectations for orders data against the input
+    Creates expectations for orders curated data against the input
     validator
 
     Args:
         validator (gx): great_expectations validator
-        expectations_storage (SalesExpectationsStorage): expectations storage
+        expectations_storage (OrdersExpectationsStorage): expectations storage
 
     Returns:
-        validator_results (gx): expectations validation results
+        validator_result (gx): expectations validation result
     """
     expectations_storage = OrdersExpectationsStorage()
 
@@ -223,24 +223,24 @@ def _validate_gx_orders_curated_expectations(
     for column in expectations_storage.columns_to_be_unique:
         validator.expect_column_values_to_be_unique(column)
 
-    validator_results = validator.validate()["success"]
+    validator_result = validator.validate()["success"]
 
-    return validator_results
+    return validator_result
 
 
 def _validate_gx_customers_curated_expectations(
     validator: gx, expectations_storage: CustomersExpectationsStorage
 ) -> gx:
     """
-    Creates expectations for customers data against the input
+    Creates expectations for customers curated data against the input
     validator
 
     Args:
         validator (gx): great_expectations validator
-        expectations_storage (SalesExpectationsStorage): expectations storage
+        expectations_storage (CustomersExpectationsStorage): expectations storage
 
     Returns:
-        validator_results (gx): expectations validation results
+        validator_result (gx): expectations validation result
     """
     expectations_storage = CustomersExpectationsStorage()
 
@@ -254,24 +254,24 @@ def _validate_gx_customers_curated_expectations(
     for column in expectations_storage.columns_with_length_equal_to:
         validator.expect_column_value_lengths_to_equal(column, 2)
 
-    validator_results = validator.validate()["success"]
+    validator_result = validator.validate()["success"]
 
-    return validator_results
+    return validator_result
 
 
 def _validate_gx_countries_curated_expectations(
     validator: gx, expectations_storage: CountriesExpectationsStorage
 ) -> gx:
     """
-    Creates expectations for countries data against the input
+    Creates expectations for countries curated data against the input
     validator
 
     Args:
         validator (gx): great_expectations validator
-        expectations_storage (SalesExpectationsStorage): expectations storage
+        expectations_storage (CountriesExpectationsStorage): expectations storage
 
     Returns:
-        validator_results (gx): expectations validation results
+        validator_result (gx): expectations validation result
     """
     expectations_storage = CountriesExpectationsStorage()
 
@@ -288,15 +288,25 @@ def _validate_gx_countries_curated_expectations(
     ):
         validator.expect_column_value_lengths_to_equal(column, length)
 
-    validator_results = validator.validate()["success"]
+    validator_result = validator.validate()["success"]
 
-    return validator_results
+    return validator_result
 
 
 def _validate_gx_analytics_base_table_clean_expectations(
     validator: gx, expectations_storage: AnalyticsBaseTableExpectationsStorage
 ) -> gx:
-    """PyDocs"""
+    """
+    Creates expectations for analytics base table consumable data against the input
+    validator
+    
+    Args:
+        validator (gx): great_expectations validator
+        expectations_storage (AnalyticsBaseTableExpectationsStorage): expectations storage
+    
+    Returns:
+        validator_result (gx): expectations validation result
+    """
     expectations_storage = AnalyticsBaseTableExpectationsStorage()
 
     for column in expectations_storage.columns_to_exist_and_be_not_null:
@@ -312,9 +322,9 @@ def _validate_gx_analytics_base_table_clean_expectations(
     ):
         validator.expect_column_value_lengths_to_equal(column, length)
 
-    validator_results = validator.validate()["success"]
+    validator_result = validator.validate()["success"]
 
-    return validator_results
+    return validator_result
 
 
 def validate_curated_flat_structure(
@@ -414,7 +424,7 @@ def validate_consumable_flat_structure(
 
     if not validation_results:
         print(
-            f"""Validation unsuccessful. {file_name} curated data
+            f"""Validation unsuccessful. {file_name} consumable data
             does not match expectations. Stopping execution now."""
         )
         sys.exit()
