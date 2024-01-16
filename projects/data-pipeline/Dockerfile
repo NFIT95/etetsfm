@@ -1,6 +1,7 @@
 FROM python:3.10-bookworm
 
 RUN curl -sSL https://install.python-poetry.org | python3 - --version 1.4.1
+# Add Poetry bin directory to PATH environment variable
 ENV PATH="${PATH}:/root/.local/bin"
 
 COPY scripts /scripts
