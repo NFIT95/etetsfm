@@ -26,8 +26,8 @@ def _fill_nulls_in_columns(
     flat_structure_to_curate: pl.DataFrame,
 ) -> pl.DataFrame:
     """
-    Fills nulls in columns in the input Polars dataframe. Datetime columns
-    are avoided
+    Fills nulls in columns in the input Polars dataframe. Columns with a non
+    relevant or unknown data type are avoided
 
     Args:
         flat_structure_to_curate (pl.DataFrame): Polars dataframe with raw data
@@ -79,7 +79,7 @@ def create_curated_flat_structure(
     flat_structure_to_curate: pl.DataFrame,
 ) -> pl.DataFrame:
     """
-    Applies curation, data validation, and materializes curated data to parquet files.
+    Applies curation functions to the input Polars dataframe
 
     Args:
         flat_structure_to_curate (pl.DataFrame): Polars dataframe with raw data
