@@ -29,13 +29,17 @@ jobs:
         working-directory: ./projects/data-pipeline
         run: make validate-lock
 
-      - name: API - Install python dependencies
+      - name: Install python dependencies
         working-directory: ./projects/data-pipeline
         run: make install-deps
 
-      - name: API - Check linting
+      - name: Check linting
         working-directory: ./projects/data-pipeline
         run: make check
+
+      - name: Build Docker image
+        working-directory: ./projects/data-pipeline
+        run: make build
 
 #      - name: API - Run tests
 #        working-directory: ./projects/data-pipeline
