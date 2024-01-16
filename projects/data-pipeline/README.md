@@ -1,7 +1,8 @@
 # Data pipeline
 
 ## Latest Update
-- Unit tests missing to complete data-pipeline app
+To complete on-prem data-pipeline app:
+- Add unit tests
 - Incorporate Kedro
 
 ### Overview
