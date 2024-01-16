@@ -1,10 +1,13 @@
 """Writer module to write data to physical files"""
 
+import logging
 from datetime import datetime
 
 import polars as pl
 
 from data_pipeline.params import DATA_ROOT_FOLDER
+
+logger = logging.getLogger(__name__)
 
 
 def write_data_to_file(
@@ -26,4 +29,5 @@ def write_data_to_file(
         write_method (str): method that will be used to write the data to a file
     """
     output_path = f"{DATA_ROOT_FOLDER}/{folder_name}/{str(datetime.now())}_{file_name}.{file_type}"
+    logger.info("File writing complete.")
     return getattr(flat_structure, write_method)(output_path)

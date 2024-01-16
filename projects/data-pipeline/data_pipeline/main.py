@@ -1,4 +1,9 @@
 """Main entry point for data pipeline"""
+import logging
+import logging.config
+
+import yaml
+
 from data_pipeline.checker import (
     check_json_lines,
     create_gx_datasources,
@@ -22,6 +27,16 @@ from data_pipeline.profiler import write_data_profile_report
 from data_pipeline.reader import read_data_from_file
 from data_pipeline.transformer import create_consumable_flat_structure
 from data_pipeline.writer import write_data_to_file
+
+LOGGING_CONF_PATH = "../../tools/conf/logging.yaml"
+
+with open(LOGGING_CONF_PATH, "r", encoding="utf-8") as file:
+    config = yaml.safe_load(file)
+
+logging.config.dictConfig(config)
+logger = logging.getLogger(__name__)
+
+logger.info("Running data pipeline.")
 
 
 def main():

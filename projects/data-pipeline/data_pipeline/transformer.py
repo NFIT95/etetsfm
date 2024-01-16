@@ -1,6 +1,10 @@
 """Transformer module to create consumable analytics base table"""
 
+import logging
+
 import polars as pl
+
+logger = logging.getLogger(__name__)
 
 
 def _create_column_prefix(json_file_name: str) -> str:
@@ -309,5 +313,7 @@ def create_consumable_flat_structure(
     consumable_flat_structure = joined_flat_structure.select(
         consumable_columns_to_select
     )
+
+    logger.info("Consumable flat structure created.")
 
     return consumable_flat_structure

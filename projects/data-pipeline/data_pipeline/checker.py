@@ -1,5 +1,6 @@
 """Checker module to define data quality checks via in-memory gx"""
 
+import logging
 import sys
 
 import great_expectations as gx
@@ -19,6 +20,8 @@ from data_pipeline.params import (
 )
 
 GX_DATA_CONTEXT_FOLDER = "tools/gx/data_context"
+
+logger = logging.getLogger(__name__)
 
 
 def check_json_lines(
@@ -55,6 +58,7 @@ def check_json_lines(
         "valid_json_lines": pl.DataFrame(json_lines_storage.valid_json_lines),
         "broken_json_lines": pl.DataFrame(json_lines_storage.broken_json_lines),
     }
+    logger.info("Check completed.")
 
     return valid_and_broken_json_lines
 
@@ -423,8 +427,11 @@ def validate_consumable_flat_structure(
     )
 
     if not validation_results:
-        print(
-            f"""Validation unsuccessful. {file_name} consumable data
-            does not match expectations. Stopping execution now."""
+        logger.info(
+            """Validation unsuccessful. %s, consumable data
+            does not match expectations. Stopping execution now.""",
+            file_name,
         )
         sys.exit()
+
+    logger.info("Validation completed.")

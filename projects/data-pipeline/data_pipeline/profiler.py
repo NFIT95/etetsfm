@@ -1,5 +1,6 @@
 """Profiler module to generate data profiles of curated and clean data"""
 
+import logging
 from datetime import datetime
 from pathlib import Path
 
@@ -7,6 +8,8 @@ import polars as pl
 from ydata_profiling import ProfileReport
 
 from data_pipeline.params import DATA_ROOT_FOLDER
+
+logger = logging.getLogger(__name__)
 
 
 def write_data_profile_report(flat_structure: pl.DataFrame, file_name: str) -> None:
@@ -26,3 +29,4 @@ def write_data_profile_report(flat_structure: pl.DataFrame, file_name: str) -> N
         f"{DATA_ROOT_FOLDER}/data_profiles/{str(datetime.now())}_{file_name}.html"
     )
     profile.to_file(output_file=output_path)
+    logger.info("Profiling completed.")

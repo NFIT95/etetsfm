@@ -1,10 +1,13 @@
 """Reader module to read data to physical files"""
 
+import logging
 import os
 
 import polars as pl
 
 from data_pipeline.params import DATA_ROOT_FOLDER
+
+logger = logging.getLogger(__name__)
 
 
 def _get_files_to_sort(folder_name: str, file_name: str, file_type: str) -> list[str]:
@@ -57,5 +60,6 @@ def read_data_from_file(
     sorted_files = sorted(files_to_sort, reverse=True, key=lambda x: x.split("_")[0])
     input_file_path = f"{DATA_ROOT_FOLDER}/{folder_name}/{sorted_files[0]}"
     flat_structure = getattr(pl, read_method)(input_file_path)
+    logger.info("File read completed.")
 
     return flat_structure

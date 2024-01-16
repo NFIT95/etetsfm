@@ -1,9 +1,12 @@
 """Extractor module to extract data from raw json files"""
 
 import json
+import logging
 import re
 
 from data_pipeline.params import JsonLinesStorage
+
+logger = logging.getLogger(__name__)
 
 
 def _remove_final_comma(json_line: dict) -> dict:
@@ -77,5 +80,6 @@ def extract_json_lines_from_json_file(json_file_name: str) -> list[dict]:
             for cleaning_function in cleaning_functions:
                 json_line = cleaning_function(json_line)
             json_lines_storage.extracted_json_lines.append(json_line)
+    logger.info("Extraction completed.")
 
     return json_lines_storage.extracted_json_lines

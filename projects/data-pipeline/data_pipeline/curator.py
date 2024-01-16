@@ -1,8 +1,11 @@
 """Curator module to apply timestamp and data cleansing"""
 
+import logging
 from datetime import datetime
 
 import polars as pl
+
+logger = logging.getLogger(__name__)
 
 
 def _add_timestamp_column(flat_structure_to_curate: pl.DataFrame) -> pl.DataFrame:
@@ -98,5 +101,6 @@ def create_curated_flat_structure(
         flat_structure_to_curate = curating_function(flat_structure_to_curate)
 
     curated_flat_structure = getattr(flat_structure_to_curate, "unique")()
+    logger.info("Curated flat structure created.")
 
     return curated_flat_structure
