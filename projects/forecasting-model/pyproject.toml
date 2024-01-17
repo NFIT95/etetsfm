@@ -7,7 +7,11 @@ license = "free"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "3.10.4"
+python = ">=3.9,<3.12"
+tensorflow-io-gcs-filesystem = "0.34.0"
+tensorflow = "^2.11"
+polars = "^0.20.4"
+
 
 
 [build-system]
