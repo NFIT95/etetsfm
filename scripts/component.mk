@@ -1,6 +1,6 @@
 MODULE = $(shell basename '$(CURDIR)')
 
-.PHONY: test format check lock install-deps
+.PHONY: install-poetry test format check validate-lock lock install-deps
 
 install-poetry:
 	curl -sSL https://install.python-poetry.org | python3 - --version 1.4.0
