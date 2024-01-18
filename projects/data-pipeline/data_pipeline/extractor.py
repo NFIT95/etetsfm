@@ -73,13 +73,16 @@ def extract_json_lines_from_json_file(json_file_name: str) -> list[dict]:
         _rename_keys,
     ]
 
-    with open(
-        "data" + "/" + "raw_data" + "/" + json_file_name + ".json", encoding="utf-8"
-    ) as json_file:
-        for json_line in json_file:
-            for cleaning_function in cleaning_functions:
-                json_line = cleaning_function(json_line)
-            json_lines_storage.extracted_json_lines.append(json_line)
-    logger.info("Extraction completed.")
+    try:
+        with open(
+            "data" + "/" + "raw_data" + "/" + json_file_name + ".json", encoding="utf-8"
+        ) as json_file:
+            for json_line in json_file:
+                for cleaning_function in cleaning_functions:
+                    json_line = cleaning_function(json_line)
+                json_lines_storage.extracted_json_lines.append(json_line)
+        logger.info("Extraction completed.")
+    except FileNotFoundError:
+        logger.info("File not found.")
 
     return json_lines_storage.extracted_json_lines
