@@ -23,7 +23,6 @@ services:
       - /bin/sh
       - -c
       - make run
-        echo "Data pipeline successfully finished running"
     networks:
       - nf
     depends_on:
