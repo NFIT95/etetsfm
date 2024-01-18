@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "db_api"
+version = "0.1.0"
+description = "data pipeline for practice app"
+authors = ["Nicola Filosi"]
+license = "free"
+readme = "README.md"
+packages = [{include = "db_api"}]
+
+[tool.poetry.dependencies]
+python = "~3.10"
+
+# Formatting
+logging = "^0.4.9.6"
+[tool.isort]
+profile = "black"
+
+[tool.pydocstyle]
+convention = "google"
+
+[tool.pylint]
+ignore = [".venv", "tests"]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
