@@ -9,6 +9,17 @@ packages = [{include = "db_api"}]
 
 [tool.poetry.dependencies]
 python = "~3.10"
+pydantic = "^2.5.3"
+pydantic-settings = "^2.1.0"
+black = "^23.12.1"
+isort = "^5.13.2"
+pylint = "^3.0.3"
+pandas = "^2.1.4"
+polars = "^0.20.3"
+great-expectations = "^0.18.7"
+ruamel-yaml = "<0.18"
+pyarrow = "^14.0.2"
+ydata-profiling = "^4.6.4"
 
 # Formatting
 logging = "^0.4.9.6"
