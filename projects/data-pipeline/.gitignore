@@ -1,8 +1,0 @@
-.env
-__pycache__/
-curated_data/
-data_profiles/
-quarantine_data/
-consumable_data/
-clean_data/
-.DS_Store
