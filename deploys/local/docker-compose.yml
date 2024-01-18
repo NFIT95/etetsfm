@@ -7,8 +7,8 @@ services:
     user: postgres
     restart: always # always restart container if it crashes
     environment:
-      - POSTGRES_USER: nicola
-      - POSTGRES_PASSWORD: filosi
+      - POSTGRES_USER=nicola
+      - POSTGRES_PASSWORD=filosi
     ports:
       - '5432:5432'
     networks:

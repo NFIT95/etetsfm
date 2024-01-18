@@ -5,6 +5,7 @@ RUN curl -sSL https://install.python-poetry.org | python3 - --version 1.4.1
 ENV PATH="${PATH}:/root/.local/bin"
 
 COPY scripts /scripts
+COPY tools /tools
 COPY projects/data-pipeline /projects/data-pipeline
 
 WORKDIR /projects/data-pipeline/
